@@ -52,3 +52,14 @@ Unit tests cover board helpers, snapshot/restore behavior, input key filtering, 
 ## Deferred Work
 
 Full implementations of the seven non-MVP games, Contribution Mode, achievements, local stats, per-game difficulty, and release-store polish remain roadmap work.
+
+## Contribution Mode Data Contract
+
+Contribution Mode is future work, but the core now has a small data contract so the snapshot and adapter preserve the right information without storing private history. `deriveContributionModeFrame(graph)` maps normalized contribution intensity to logical pixels:
+
+- `0` -> `empty`
+- `1` -> `bonus`
+- `2` or `3` -> `obstacle`
+- `4` and above -> `enemy`
+
+`createContributionModeSeed(graph, gameId)` returns only `{ schemaVersion, gameId, rows, columns, intensityBuckets }`. It deliberately excludes dates, contribution counts beyond normalized buckets, URLs, user names, and any browser history. Sharing a future level seed should share this generated configuration, not raw profile data.
