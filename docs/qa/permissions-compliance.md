@@ -56,3 +56,5 @@ Firefox AMO:
 ## Privacy Claim Alignment
 
 The public privacy page states that no telemetry or external analytics are included and gameplay preferences/high scores remain local. The manifests and runtime audit match that claim: there are no network APIs, remote-code paths or analytics integrations in extension runtime sources.
+
+Store submission copy for Firefox AMO and Microsoft Edge Add-ons must keep this same distinction: nothing is collected or transmitted, while preferences and high scores remain local in browser storage.

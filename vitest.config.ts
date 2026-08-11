@@ -2,8 +2,23 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
-    globals: false,
-    include: ['extension/**/*.test.ts', 'scripts/**/*.test.ts'],
+    projects: [
+      {
+        test: {
+          environment: 'jsdom',
+          globals: false,
+          include: ['extension/**/*.test.ts'],
+          name: 'extension',
+        },
+      },
+      {
+        test: {
+          environment: 'node',
+          globals: false,
+          include: ['scripts/**/*.test.ts'],
+          name: 'scripts',
+        },
+      },
+    ],
   },
 });

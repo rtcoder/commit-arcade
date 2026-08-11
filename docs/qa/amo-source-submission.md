@@ -15,6 +15,8 @@ Expected artifacts:
 - `dist/commit-arcade-firefox-v1.0.0.zip`
 - `dist/commit-arcade-firefox-source-v1.0.0.zip`
 
+AMO listing metadata and reviewer notes are prepared in `docs/qa/firefox-amo-listing.md`.
+
 Reviewer environment:
 
 - Node.js 22.x

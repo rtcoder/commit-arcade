@@ -42,3 +42,5 @@ Each archive unzips directly into an extension root and includes:
 Store archives intentionally exclude source maps and source TypeScript files. Firefox AMO source-review material is handled separately from these installable extension archives.
 
 See `docs/qa/amo-source-submission.md` for Firefox source-review package instructions.
+
+Safari packaging is handled separately through Xcode using `extension/chrome/build` as the WebExtension input. See `extension/safari/README.md`.
