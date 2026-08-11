@@ -18,9 +18,8 @@ jobs:
       - run: npm run build:chrome
       - run: npm run build:firefox
       - run: npm run validate:packages
-      - run: cd extension/chrome/build && zip -r ../../../commit-arcade-chrome-${GITHUB_REF_NAME}.zip .
-      - run: cd extension/firefox/build && zip -r ../../../commit-arcade-firefox-${GITHUB_REF_NAME}.zip .
+      - run: npm run package:archives -- ${GITHUB_REF_NAME}
       - uses: actions/upload-artifact@v4
         with:
           name: commit-arcade-extension-packages
-          path: commit-arcade-*.zip
+          path: dist/commit-arcade-*.zip
