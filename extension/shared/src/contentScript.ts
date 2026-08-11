@@ -243,11 +243,18 @@ function togglePicker(
     item.className = 'commit-arcade-picker-item';
     item.textContent = game.name;
     item.setAttribute('role', 'menuitem');
+    item.setAttribute('aria-label', game.status === 'playable' ? `Start ${game.name}. ${game.description}` : `${game.name}. Planned game.`);
     if (game.status === 'planned') {
       item.disabled = true;
       item.setAttribute('aria-disabled', 'true');
     } else {
       item.addEventListener('click', () => startGame(game, button));
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          startGame(game, button);
+        }
+      });
     }
     picker.append(item);
   }
@@ -320,19 +327,25 @@ function renderSessionContent(session: HTMLElement, model: SessionViewModel): vo
   const status = session.ownerDocument.createElement('span');
   status.textContent = model.status;
 
+  const help = session.ownerDocument.createElement('span');
+  help.className = 'commit-arcade-controls-help';
+  help.textContent = controlsHelpForGame(model.game.id);
+
   const restart = session.ownerDocument.createElement('button');
   restart.type = 'button';
   restart.className = 'commit-arcade-session-button commit-arcade-restart-button';
+  restart.setAttribute('aria-label', `Restart ${model.game.name}`);
   restart.textContent = 'Restart';
   restart.addEventListener('click', model.onRestart);
 
   const stop = session.ownerDocument.createElement('button');
   stop.type = 'button';
   stop.className = 'commit-arcade-session-button commit-arcade-stop-button';
+  stop.setAttribute('aria-label', `Stop ${model.game.name}`);
   stop.textContent = 'Stop';
   stop.addEventListener('click', model.onStop);
 
-  session.append(title, score, best, status, restart, stop);
+  session.append(title, score, best, status, help, restart, stop);
 }
 
 function usedKeysForGame(gameId: string): ReadonlySet<string> {
@@ -345,6 +358,19 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
       return new Set(['ArrowUp', ' ', 'Space', 'Escape']);
     default:
       return new Set(['Escape']);
+  }
+}
+
+function controlsHelpForGame(gameId: string): string {
+  switch (gameId) {
+    case 'snake':
+      return 'Move with arrows or WASD. Esc stops.';
+    case 'runner':
+      return 'Jump with Up or Space. Esc stops.';
+    case 'flappy':
+      return 'Flap with Up or Space. Esc stops.';
+    default:
+      return 'Esc stops.';
   }
 }
 
