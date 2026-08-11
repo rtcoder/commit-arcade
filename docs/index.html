@@ -9,36 +9,59 @@
   <body>
     <main class="site-shell">
       <section class="hero">
-        <img class="hero-logo" src="assets/logo.svg" alt="Commit Arcade">
-        <h1>Commit Arcade</h1>
-        <p class="tagline">Play your GitHub contributions.</p>
-        <p>Commit Arcade turns the contribution graph on a GitHub profile into a tiny local arcade screen.</p>
-        <div class="graph" aria-label="Contribution graph game mockup">
-          <span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span>
+        <div class="hero-copy">
+          <img class="hero-logo" src="assets/logo.svg" alt="Commit Arcade">
+          <h1>Commit Arcade</h1>
+          <p class="tagline">Play your GitHub contributions.</p>
+          <p class="lead">Commit Arcade turns the visible contribution graph on a GitHub profile page into a tiny local arcade screen. It runs only on github.com, uses packaged extension code, and restores the graph when play stops.</p>
+          <div class="actions" aria-label="Install options">
+            <a class="button primary" href="https://github.com/rtcoder/commit-arcade/releases">Install for Chrome</a>
+            <a class="button" href="https://github.com/rtcoder/commit-arcade/releases">Install for Firefox</a>
+          </div>
         </div>
-        <span class="button-demo">▶ Play</span>
+        <div class="screen" aria-label="Commit Arcade game preview">
+          <div class="browser-bar"><span></span><span></span><span></span><strong>github.com/profile</strong></div>
+          <div class="graph-preview">
+            <span></span><span></span><span></span><span class="hot"></span><span></span><span class="player"></span><span></span><span></span><span class="coin"></span><span></span><span></span><span></span><span class="hot"></span><span></span><span></span><span></span><span></span><span class="coin"></span><span></span><span></span><span></span><span class="player"></span><span></span><span></span><span></span><span></span><span class="hot"></span><span></span><span></span><span></span>
+          </div>
+          <div class="hud"><span>Commit Runner</span><span>Score 7</span><span>Esc stops</span></div>
+        </div>
       </section>
-      <section>
-        <h2>Supported Browsers</h2>
-        <p>Chrome, Edge, Brave, Opera, Vivaldi, Firefox, and Safari packaging notes.</p>
-      </section>
-      <section>
-        <h2>Games</h2>
+
+      <section class="band">
+        <h2>v1.0 Release</h2>
         <div class="grid">
-          <div class="tile">Commit Runner</div>
-          <div class="tile">Snake</div>
-          <div class="tile">Flappy Commit</div>
+          <article class="tile">
+            <h3>Chrome and Chromium</h3>
+            <p>Use the Chrome package for Chrome, Edge, Brave, Opera and Vivaldi. Store submission assets are prepared under <code>docs/store/chrome</code>.</p>
+          </article>
+          <article class="tile">
+            <h3>Firefox</h3>
+            <p>Use the Firefox package and AMO source archive from the v1.0 release workflow. Reviewer notes are ready in QA docs.</p>
+          </article>
+          <article class="tile">
+            <h3>Safari</h3>
+            <p>Safari remains an Xcode packaging path for v1.0. See <code>extension/safari/README.md</code> for the manual conversion flow.</p>
+          </article>
         </div>
-        <p><a href="games.html">View the full game roadmap</a>.</p>
       </section>
-      <section>
-        <h2>Privacy</h2>
-        <p>No credentials, contribution data, browsing history, analytics, or telemetry are collected. Gameplay stays local.</p>
-        <p><a href="privacy.html">Read the privacy statement</a>.</p>
+
+      <section class="band">
+        <h2>Games</h2>
+        <p>v1.0 ships three playable games: Commit Runner, Snake and Flappy Commit.</p>
+        <p><a href="games.html">View controls and troubleshooting</a>.</p>
       </section>
-      <footer>
-        <p><a href="https://github.com/rtcoder/commit-arcade">GitHub repository</a></p>
-      </footer>
+
+      <section class="band">
+        <h2>Privacy And Review</h2>
+        <p>No credentials, contribution data, browsing history, analytics or telemetry are collected or transmitted. Gameplay preferences and high scores remain local in browser storage.</p>
+        <p><a href="privacy.html">Read the privacy statement</a> or review <a href="../CHANGELOG.md">CHANGELOG.md</a>.</p>
+      </section>
+
+      <section class="band">
+        <h2>Support</h2>
+        <p>For bugs, store review questions or release support, use <a href="https://github.com/rtcoder/commit-arcade/issues">GitHub Issues</a>.</p>
+      </section>
     </main>
   </body>
 </html>
