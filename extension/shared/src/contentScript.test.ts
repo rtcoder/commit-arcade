@@ -138,6 +138,99 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 
+  it('shows a compact session HUD with game name, score and high score', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="0" x="12" y="0"></rect>
+        </svg>
+      </section>
+    `;
+
+    const controller = initializeCommitArcade(document, {
+      gameFactories: {
+        runner: () => ({
+          id: 'runner',
+          name: 'Scoring Runner',
+          description: 'Scores immediately',
+          status: 'playable',
+          start: () => undefined,
+          update: () => undefined,
+          handleInput: () => undefined,
+          render: (_renderer) => undefined,
+          stop: () => undefined,
+        }),
+      },
+    });
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    const hud = document.querySelector<HTMLElement>('.commit-arcade-session');
+
+    expect(hud?.textContent).toContain('Scoring Runner');
+    expect(hud?.textContent).toContain('Score 0');
+    expect(hud?.textContent).toContain('Best 0');
+    expect(hud?.textContent).toContain('Playing');
+
+    controller.destroy();
+  });
+
+  it('updates the session HUD score and exposes Restart and Stop after game over', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0" fill="#ebedf0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="0" x="12" y="0" fill="#ebedf0"></rect>
+        </svg>
+      </section>
+    `;
+    let starts = 0;
+
+    const controller = initializeCommitArcade(document, {
+      gameFactories: {
+        runner: () => ({
+          id: 'runner',
+          name: 'Restartable Runner',
+          description: 'Scores and ends immediately',
+          status: 'playable',
+          start: ({ onScore, onGameOver }) => {
+            starts += 1;
+            onScore?.(starts === 1 ? 4 : 1);
+            onGameOver?.();
+          },
+          update: () => undefined,
+          handleInput: () => undefined,
+          render: (_renderer) => undefined,
+          stop: () => undefined,
+        }),
+      },
+    });
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    const hud = document.querySelector<HTMLElement>('.commit-arcade-session');
+
+    expect(hud?.textContent).toContain('Score 4');
+    expect(hud?.textContent).toContain('Best 4');
+    expect(hud?.textContent).toContain('Game over');
+    expect(document.querySelector<HTMLButtonElement>('.commit-arcade-restart-button')).not.toBeNull();
+
+    document.querySelector<HTMLButtonElement>('.commit-arcade-restart-button')?.click();
+
+    expect(starts).toBe(2);
+    expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Score 1');
+    expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Best 4');
+
+    document.querySelector<HTMLButtonElement>('.commit-arcade-stop-button')?.click();
+
+    expect(document.querySelector('.commit-arcade-session')).toBeNull();
+    expect(document.querySelector('[data-commit-arcade-state]')).toBeNull();
+    expect(document.querySelector('rect')?.getAttribute('fill')).toBe('#ebedf0');
+
+    controller.destroy();
+  });
+
   it('stops timers and restores the graph when the tab becomes hidden', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">
