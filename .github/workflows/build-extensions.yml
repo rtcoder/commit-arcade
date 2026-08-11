@@ -1,0 +1,25 @@
+name: Build Extensions
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:chrome
+      - run: npm run build:firefox
+      - run: cd extension/chrome/build && zip -r ../../../commit-arcade-chrome-${GITHUB_REF_NAME}.zip .
+      - run: cd extension/firefox/build && zip -r ../../../commit-arcade-firefox-${GITHUB_REF_NAME}.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: commit-arcade-extension-packages
+          path: commit-arcade-*.zip

@@ -1,0 +1,21 @@
+{
+  "name": "commit-arcade",
+  "version": "0.1.0",
+  "description": "Play your GitHub contributions as tiny arcade games.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build:chrome": "node scripts/build-extension.mjs chrome",
+    "build:firefox": "node scripts/build-extension.mjs firefox",
+    "lint": "tsc --noEmit",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "esbuild": "^0.24.2",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
