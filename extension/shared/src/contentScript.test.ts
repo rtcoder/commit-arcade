@@ -161,4 +161,67 @@ describe('initializeCommitArcade', () => {
 
     controller.destroy();
   });
+
+  it('replaces the controller after GitHub soft navigation changes the graph', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="1" x="12" y="0"></rect>
+        </svg>
+      </section>
+    `;
+
+    const controller = initializeCommitArcade(document);
+    const firstButton = document.querySelector<HTMLButtonElement>('.commit-arcade-button');
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-02-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-02-02" data-level="1" x="12" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-02-03" data-level="2" x="24" y="0"></rect>
+        </svg>
+      </section>
+    `;
+    document.dispatchEvent(new Event('turbo:render'));
+
+    const nextButtons = document.querySelectorAll<HTMLButtonElement>('.commit-arcade-button');
+
+    expect(nextButtons).toHaveLength(1);
+    expect(nextButtons[0]).not.toBe(firstButton);
+    expect(document.querySelector('[data-commit-arcade-state]')).toBeNull();
+
+    controller.destroy();
+  });
+
+  it('re-scans the graph after browser back or forward navigation', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="1" x="12" y="0"></rect>
+        </svg>
+      </section>
+    `;
+
+    const controller = initializeCommitArcade(document);
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-03-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-03-02" data-level="1" x="12" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-03-03" data-level="2" x="24" y="0"></rect>
+        </svg>
+      </section>
+    `;
+
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    expect(document.querySelectorAll<HTMLButtonElement>('.commit-arcade-button')).toHaveLength(1);
+
+    controller.destroy();
+  });
 });
