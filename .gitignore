@@ -1,0 +1,6 @@
+.ytrack
+node_modules/
+dist/
+extension/chrome/build/
+extension/firefox/build/
+extension/safari/build/
