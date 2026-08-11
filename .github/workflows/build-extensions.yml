@@ -3,7 +3,7 @@ name: Build Extensions
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   package:
@@ -15,11 +15,22 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --run
       - run: npm run build:chrome
       - run: npm run build:firefox
       - run: npm run validate:packages
       - run: npm run package:archives -- ${GITHUB_REF_NAME}
+      - run: npm run package:amo-source -- ${GITHUB_REF_NAME}
       - uses: actions/upload-artifact@v4
         with:
-          name: commit-arcade-extension-packages
-          path: dist/commit-arcade-*.zip
+          name: commit-arcade-chrome-${{ github.ref_name }}
+          path: dist/commit-arcade-chrome-${{ github.ref_name }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: commit-arcade-firefox-${{ github.ref_name }}
+          path: dist/commit-arcade-firefox-${{ github.ref_name }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: commit-arcade-firefox-source-${{ github.ref_name }}
+          path: dist/commit-arcade-firefox-source-${{ github.ref_name }}.zip
