@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { initializeCommitArcade } from './contentScript';
+import type { CommitArcadeSettingsStorage } from '../core/settings';
 
 describe('initializeCommitArcade', () => {
   it('returns a controller with a cleanup method', () => {
@@ -226,6 +227,94 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 
+  it('orders the last selected game first and persists selected game plus high score', async () => {
+    document.body.innerHTML = contributionGraphFixture();
+    const values: Record<string, unknown> = {
+      commitArcadeSettings: {
+        highScores: { snake: 7 },
+        selectedGame: 'snake',
+        soundEnabled: false,
+      },
+    };
+    const storage = createMemoryStorage(values);
+
+    const controller = initializeCommitArcade(document, { storage });
+    await flushPromises();
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+
+    const pickerItems = document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item');
+
+    expect(pickerItems[0]?.textContent).toBe('Snake');
+    expect(pickerItems[0]?.getAttribute('aria-current')).toBe('true');
+
+    pickerItems[0]?.click();
+
+    expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Best 7');
+    expect(values.commitArcadeSettings).toMatchObject({ selectedGame: 'snake' });
+
+    controller.destroy();
+  });
+
+  it('persists a new high score without storing contribution graph data', async () => {
+    document.body.innerHTML = contributionGraphFixture();
+    const values: Record<string, unknown> = {};
+    const storage = createMemoryStorage(values);
+
+    const controller = initializeCommitArcade(document, {
+      gameFactories: {
+        runner: () => ({
+          id: 'runner',
+          name: 'Storage Runner',
+          description: 'Scores immediately',
+          status: 'playable',
+          start: ({ onScore, onGameOver }) => {
+            onScore?.(9);
+            onGameOver?.();
+          },
+          update: () => undefined,
+          handleInput: () => undefined,
+          render: () => undefined,
+          stop: () => undefined,
+        }),
+      },
+      storage,
+    });
+    await flushPromises();
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    await flushPromises();
+
+    expect(values.commitArcadeSettings).toMatchObject({
+      highScores: { runner: 9 },
+      selectedGame: 'runner',
+    });
+    expect(JSON.stringify(values.commitArcadeSettings)).not.toContain('2026-01-01');
+
+    controller.destroy();
+  });
+
+  it('continues gameplay when settings storage fails', async () => {
+    document.body.innerHTML = contributionGraphFixture();
+    const storage: CommitArcadeSettingsStorage = {
+      async get() {
+        throw new Error('storage get unavailable');
+      },
+      async set() {
+        throw new Error('storage set unavailable');
+      },
+    };
+
+    const controller = initializeCommitArcade(document, { storage });
+    await flushPromises();
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    expect(document.querySelector('[data-commit-arcade-state="player"]')).not.toBeNull();
+
+    controller.destroy();
+  });
+
   it('updates the session HUD score and exposes Restart and Stop after game over', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">
@@ -368,3 +457,33 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 });
+
+function contributionGraphFixture(): string {
+  return `
+    <section aria-label="Contribution Graph">
+      <svg>
+        <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0" fill="#ebedf0"></rect>
+        <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="0" x="12" y="0" fill="#ebedf0"></rect>
+        <rect class="ContributionCalendar-day" data-date="2026-01-03" data-level="0" x="0" y="12" fill="#ebedf0"></rect>
+        <rect class="ContributionCalendar-day" data-date="2026-01-04" data-level="0" x="12" y="12" fill="#ebedf0"></rect>
+      </svg>
+    </section>
+  `;
+}
+
+function createMemoryStorage(values: Record<string, unknown>): CommitArcadeSettingsStorage {
+  return {
+    async get(key) {
+      return { [key]: values[key] };
+    },
+    async set(patch) {
+      Object.assign(values, patch);
+    },
+  };
+}
+
+async function flushPromises(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+}
