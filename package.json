@@ -1,6 +1,6 @@
 {
   "name": "commit-arcade",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Play your GitHub contributions as tiny arcade games.",
   "type": "module",
   "private": true,
@@ -20,9 +20,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "esbuild": "^0.24.2",
+    "esbuild": "^0.28.2",
     "jsdom": "^26.0.0",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "vitest": "^3.2.7"
   }
 }
