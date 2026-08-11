@@ -20,20 +20,29 @@ interface PositionedElement {
 }
 
 export function findContributionGraph(root: ParentNode): ContributionGraph | null {
-  const svgCells = Array.from(root.querySelectorAll('rect.ContributionCalendar-day, rect[data-date]'));
-  if (svgCells.length > 0) {
-    return graphFromPositionedElements(svgCells);
-  }
-
-  const tableCells = Array.from(root.querySelectorAll('[data-date][data-level], [data-date][data-count]'));
-  if (tableCells.length > 0) {
-    return graphFromPositionedElements(tableCells);
-  }
-
-  return null;
+  const cells = Array.from(root.querySelectorAll('rect.ContributionCalendar-day, rect[data-date], [data-date][data-level], [data-date][data-count]'));
+  return graphFromBestContainer(cells);
 }
 
-function graphFromPositionedElements(elements: Element[]): ContributionGraph | null {
+function graphFromBestContainer(elements: Element[]): ContributionGraph | null {
+  const grouped = new Map<Element, Element[]>();
+  for (const element of elements) {
+    const container = closestGraphContainer(element);
+    grouped.set(container, [...(grouped.get(container) ?? []), element]);
+  }
+
+  const bestGroup = [...grouped.entries()]
+    .filter(([, group]) => group.length > 0)
+    .sort((a, b) => b[1].length - a[1].length)[0];
+
+  if (bestGroup === undefined) {
+    return null;
+  }
+
+  return graphFromPositionedElements(bestGroup[1], bestGroup[0]);
+}
+
+function graphFromPositionedElements(elements: Element[], container: Element): ContributionGraph | null {
   const positioned = elements
     .map(toPositionedElement)
     .filter((cell): cell is PositionedElement => cell !== null)
@@ -56,14 +65,14 @@ function graphFromPositionedElements(elements: Element[]): ContributionGraph | n
 
   return {
     cells,
-    container: closestGraphContainer(positioned[0]!.element),
+    container,
     size: { rows: rows.length, columns: columns.length },
   };
 }
 
 function toPositionedElement(element: Element): PositionedElement | null {
-  const x = numericAttribute(element, 'x') ?? numericAttribute(element, 'data-column') ?? inferIndex(element);
-  const y = numericAttribute(element, 'y') ?? numericAttribute(element, 'data-row') ?? 0;
+  const x = numericAttribute(element, 'x') ?? numericAttribute(element, 'data-column') ?? domColumnIndex(element);
+  const y = numericAttribute(element, 'y') ?? numericAttribute(element, 'data-row') ?? domRowIndex(element);
   if (x === null || y === null) {
     return null;
   }
@@ -85,9 +94,18 @@ function numericAttribute(element: Element, name: string): number | null {
   return Number.isFinite(numeric) ? numeric : null;
 }
 
-function inferIndex(element: Element): number {
+function domColumnIndex(element: Element): number {
   const parent = element.parentElement;
   return parent === null ? 0 : Array.from(parent.children).indexOf(element);
+}
+
+function domRowIndex(element: Element): number {
+  const row = element.closest('tr, [role="row"], g');
+  const parent = row?.parentElement;
+  if (row === null || row === undefined || parent == null) {
+    return 0;
+  }
+  return Array.from(parent.children).indexOf(row);
 }
 
 function sortedUnique(values: number[]): number[] {

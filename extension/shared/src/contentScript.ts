@@ -19,29 +19,37 @@ export interface CommitArcadeOptions {
 
 export function initializeCommitArcade(root: Document = document, options: CommitArcadeOptions = {}): CommitArcadeController {
   const abortController = new AbortController();
-  const graph = findContributionGraph(root);
   const ownedElements: Element[] = [];
   const view = root.defaultView ?? window;
   const inputManager = createInputManager(view);
+  let activeGraph = findContributionGraph(root);
   let activeEngine: GameEngine | null = null;
   let activeSnapshot: GraphSnapshot | null = null;
   let activeFrame = 0;
   let lastFrameTime = 0;
   let activeButton: HTMLButtonElement | null = null;
 
-  if (graph === null) {
-    return {
-      destroy(): void {
-        inputManager.destroy();
-        abortController.abort();
-      },
-    };
-  }
+  installGraph();
+  root.addEventListener('turbo:render', rescanGraph, { signal: abortController.signal });
+  view.addEventListener('popstate', rescanGraph, { signal: abortController.signal });
 
-  const activeGraph = graph;
-  root.documentElement.dataset.commitArcadeReady = 'true';
+  return {
+    destroy(): void {
+      stopGame(null);
+      inputManager.destroy();
+      abortController.abort();
+      removeOwnedElements();
+      delete root.documentElement.dataset.commitArcadeReady;
+    },
+  };
 
-  if (activeGraph.container.querySelector('.commit-arcade-button') === null) {
+  function installGraph(): void {
+    if (activeGraph === null || activeGraph.container.querySelector('.commit-arcade-button') !== null) {
+      return;
+    }
+    const graph = activeGraph;
+
+    root.documentElement.dataset.commitArcadeReady = 'true';
     const button = root.createElement('button');
     button.type = 'button';
     button.className = 'commit-arcade-button';
@@ -52,54 +60,50 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         stopGame(button);
         return;
       }
-      togglePicker(root, activeGraph.container, button, ownedElements, startGame);
+      togglePicker(root, graph.container, button, ownedElements, startGame);
     }, {
       signal: abortController.signal,
     });
-    activeGraph.container.insertAdjacentElement('afterbegin', button);
+    graph.container.insertAdjacentElement('afterbegin', button);
     ownedElements.push(button);
-
     root.addEventListener(
       'visibilitychange',
       () => {
         if (root.hidden && activeEngine !== null) {
           stopGame(activeButton);
-          showMessage(root, activeGraph.container, ownedElements, 'Paused. Commit Arcade restored the graph.');
+          showMessage(root, graph.container, ownedElements, 'Paused. Commit Arcade restored the graph.');
         }
       },
       { signal: abortController.signal },
     );
   }
 
-  return {
-    destroy(): void {
-      stopGame(null);
-      inputManager.destroy();
-      abortController.abort();
-      for (const element of ownedElements) {
-        element.remove();
-      }
-      delete root.documentElement.dataset.commitArcadeReady;
-    },
-  };
+  function rescanGraph(): void {
+    stopGame(activeButton);
+    removeOwnedElements();
+    delete root.documentElement.dataset.commitArcadeReady;
+    activeGraph = findContributionGraph(root);
+    installGraph();
+  }
 
   function startGame(game: GameMetadata, button: HTMLButtonElement): void {
-    if (game.status !== 'playable') {
+    if (activeGraph === null || game.status !== 'playable') {
       return;
     }
+    const graph = activeGraph;
     const playableGame = createPlayableGame(game.id, options.gameFactories);
     if (playableGame === null) {
       return;
     }
-    activeGraph.container.querySelector('.commit-arcade-picker')?.remove();
-    activeSnapshot = snapshotCells(activeGraph.cells.map((cell) => cell.element));
-    const renderer = createBoardRenderer(activeGraph);
+    graph.container.querySelector('.commit-arcade-picker')?.remove();
+    activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
+    const renderer = createBoardRenderer(graph);
     activeEngine = createGameEngine({
       renderer,
-      size: activeGraph.size,
+      size: graph.size,
       onError: () => {
         stopGame(button);
-        showMessage(root, activeGraph.container, ownedElements, 'Game over. Commit Arcade restored the graph.');
+        showMessage(root, graph.container, ownedElements, 'Game over. Commit Arcade restored the graph.');
       },
       onGameOver: () => inputManager.deactivate(),
     });
@@ -136,6 +140,12 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     if (button !== null) {
       button.textContent = '▶ Play';
       button.setAttribute('aria-label', 'Play Commit Arcade');
+    }
+  }
+
+  function removeOwnedElements(): void {
+    for (const element of ownedElements.splice(0)) {
+      element.remove();
     }
   }
 
