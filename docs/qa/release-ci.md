@@ -1,6 +1,6 @@
 # Release CI
 
-The release workflow runs on every push and can also be started manually. Tag pushes such as `v1.0.0` use the tag name for artifact names; branch pushes use the package version from `package.json`.
+The release workflow runs on version tag pushes such as `v1.0.0` and can also be started manually. Tag pushes use the tag name for artifact and ZIP names.
 
 Package and source manifest versions are `1.0.0` for the v1 release. Generated build manifests are stamped from `package.json` so release packages use the package version as the source of truth.
 
@@ -31,8 +31,6 @@ The `Build Extensions` workflow uploads predictable artifacts:
 - `commit-arcade-chrome-v1.0.0` containing `commit-arcade-chrome-v1.0.0.zip`
 - `commit-arcade-firefox-v1.0.0` containing `commit-arcade-firefox-v1.0.0.zip`
 - `commit-arcade-firefox-source-v1.0.0` containing `commit-arcade-firefox-source-v1.0.0.zip`
-
-For non-tag pushes, artifact names and ZIP filenames use the normalized package version. This keeps release branch builds useful without requiring a semver tag and avoids invalid artifact names from branch paths.
 
 Release notes live in `CHANGELOG.md`.
 

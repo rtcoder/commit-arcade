@@ -2,6 +2,8 @@ name: Build Extensions
 
 on:
   push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -13,38 +15,23 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - id: package-version
-        run: echo "version=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
-      - id: package-suffix
-        env:
-          PACKAGE_VERSION: ${{ steps.package-version.outputs.version }}
-        run: |
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
-          fi
       - run: npm ci
       - run: npm run lint
       - run: npm test -- --run
       - run: npm run build:chrome
       - run: npm run build:firefox
       - run: npm run validate:packages
-      - run: npm run package:archives -- "${PACKAGE_VERSION}"
-        env:
-          PACKAGE_VERSION: ${{ steps.package-suffix.outputs.value }}
-      - run: npm run package:amo-source -- "${PACKAGE_VERSION}"
-        env:
-          PACKAGE_VERSION: ${{ steps.package-suffix.outputs.value }}
+      - run: npm run package:archives -- "${GITHUB_REF_NAME}"
+      - run: npm run package:amo-source -- "${GITHUB_REF_NAME}"
       - uses: actions/upload-artifact@v7
         with:
-          name: commit-arcade-chrome-${{ steps.package-suffix.outputs.value }}
-          path: dist/commit-arcade-chrome-${{ steps.package-suffix.outputs.value }}.zip
+          name: commit-arcade-chrome-${{ github.ref_name }}
+          path: dist/commit-arcade-chrome-${{ github.ref_name }}.zip
       - uses: actions/upload-artifact@v7
         with:
-          name: commit-arcade-firefox-${{ steps.package-suffix.outputs.value }}
-          path: dist/commit-arcade-firefox-${{ steps.package-suffix.outputs.value }}.zip
+          name: commit-arcade-firefox-${{ github.ref_name }}
+          path: dist/commit-arcade-firefox-${{ github.ref_name }}.zip
       - uses: actions/upload-artifact@v7
         with:
-          name: commit-arcade-firefox-source-${{ steps.package-suffix.outputs.value }}
-          path: dist/commit-arcade-firefox-source-${{ steps.package-suffix.outputs.value }}.zip
+          name: commit-arcade-firefox-source-${{ github.ref_name }}
+          path: dist/commit-arcade-firefox-source-${{ github.ref_name }}.zip
