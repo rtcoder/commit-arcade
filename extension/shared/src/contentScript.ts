@@ -3,6 +3,7 @@ import { createGameEngine, type GameEngine } from '../core/gameEngine';
 import { findContributionGraph } from '../core/githubContributionGraph';
 import { gameRegistry } from '../core/gameRegistry';
 import { createInputManager } from '../core/inputManager';
+import { loadSettings, saveSettings, type CommitArcadeSettings, type CommitArcadeSettingsStorage } from '../core/settings';
 import { restoreSnapshot, snapshotCells, type GraphSnapshot } from '../core/stateSnapshot';
 import { createFlappyGame } from '../games/flappy/flappyGame';
 import { createRunnerGame } from '../games/runner/runnerGame';
@@ -15,6 +16,7 @@ export interface CommitArcadeController {
 
 export interface CommitArcadeOptions {
   gameFactories?: Partial<Record<string, () => CommitArcadeGame>>;
+  storage?: CommitArcadeSettingsStorage;
 }
 
 export function initializeCommitArcade(root: Document = document, options: CommitArcadeOptions = {}): CommitArcadeController {
@@ -33,6 +35,14 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeStatus = 'Ready';
   let activeSession: HTMLElement | null = null;
   const highScores: Record<string, number> = {};
+  let selectedGame = 'runner';
+  let settingsLoaded = options.storage === undefined;
+  const settingsPromise = loadSettings(options.storage).then((settings) => {
+    selectedGame = settings.selectedGame;
+    Object.assign(highScores, settings.highScores);
+    settingsLoaded = true;
+    return settings;
+  });
 
   installGraph();
   root.addEventListener('turbo:render', rescanGraph, { signal: abortController.signal });
@@ -65,7 +75,15 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         stopGame(button);
         return;
       }
-      togglePicker(root, graph.container, button, ownedElements, startGame);
+      if (!settingsLoaded) {
+        void settingsPromise.finally(() => {
+          if (activeEngine === null && activeSession === null && graph.container.querySelector('.commit-arcade-picker') === null) {
+            togglePicker(root, graph.container, button, ownedElements, startGame, selectedGame);
+          }
+        });
+        return;
+      }
+      togglePicker(root, graph.container, button, ownedElements, startGame, selectedGame);
     }, {
       signal: abortController.signal,
     });
@@ -104,6 +122,8 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeGame = playableGame;
     activeScore = 0;
     activeStatus = 'Playing';
+    selectedGame = game.id;
+    persistSettings({ selectedGame });
     activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
     activeSession = showSession(root, graph.container, ownedElements, {
       game: playableGame,
@@ -131,6 +151,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       onScore: (score) => {
         activeScore = score;
         highScores[game.id] = Math.max(highScores[game.id] ?? 0, score);
+        persistSettings({ highScores: { ...highScores } });
         renderSession();
       },
     });
@@ -215,6 +236,10 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       status: activeStatus,
     });
   }
+
+  function persistSettings(patch: Partial<CommitArcadeSettings>): void {
+    void saveSettings(patch, options.storage).catch(() => undefined);
+  }
 }
 
 function togglePicker(
@@ -223,6 +248,7 @@ function togglePicker(
   button: HTMLButtonElement,
   ownedElements: Element[],
   startGame: (game: GameMetadata, button: HTMLButtonElement) => void,
+  selectedGame: string,
 ): void {
   const existingPicker = container.querySelector('.commit-arcade-picker');
   if (existingPicker !== null) {
@@ -237,13 +263,16 @@ function togglePicker(
   picker.setAttribute('role', 'menu');
   picker.setAttribute('aria-label', 'Choose a game');
 
-  for (const game of gameRegistry) {
+  for (const game of orderedGames(selectedGame)) {
     const item = root.createElement('button');
     item.type = 'button';
     item.className = 'commit-arcade-picker-item';
     item.textContent = game.name;
     item.setAttribute('role', 'menuitem');
     item.setAttribute('aria-label', game.status === 'playable' ? `Start ${game.name}. ${game.description}` : `${game.name}. Planned game.`);
+    if (game.id === selectedGame) {
+      item.setAttribute('aria-current', 'true');
+    }
     if (game.status === 'planned') {
       item.disabled = true;
       item.setAttribute('aria-disabled', 'true');
@@ -261,6 +290,14 @@ function togglePicker(
 
   button.insertAdjacentElement('afterend', picker);
   ownedElements.push(picker);
+}
+
+function orderedGames(selectedGame: string): readonly GameMetadata[] {
+  const selected = gameRegistry.find((game) => game.id === selectedGame);
+  if (selected === undefined) {
+    return gameRegistry;
+  }
+  return [selected, ...gameRegistry.filter((game) => game.id !== selectedGame)];
 }
 
 function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['gameFactories'] = {}): CommitArcadeGame | null {
