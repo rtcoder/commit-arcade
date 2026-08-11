@@ -44,3 +44,17 @@ Store archives intentionally exclude source maps and source TypeScript files. Fi
 See `docs/qa/amo-source-submission.md` for Firefox source-review package instructions.
 
 Safari packaging is handled separately through Xcode using `extension/chrome/build` as the WebExtension input. See `extension/safari/README.md`.
+
+## V1.0.0 Browser Availability Smoke
+
+Recorded on macOS 26.5.2 during release-candidate QA:
+
+- Google Chrome 151.0.7922.77
+- Mozilla Firefox 151.0.4
+- Microsoft Edge 151.0.4129.59
+- Brave Browser 144.1.86.142
+- Opera 122.0.5643.92
+- Safari 26.5.2
+- Vivaldi unavailable locally
+
+Chrome, Edge, Brave and Opera share the Chromium package path. Firefox uses the dedicated MV2 package path. Safari remains a documented conversion target, not an automated archive target.

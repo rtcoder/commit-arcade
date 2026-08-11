@@ -40,26 +40,29 @@ Covered by:
 
 Environment:
 
-- Codex In-app Browser, unauthenticated GitHub session.
-- Build artifacts available from `npm run build:chrome` and `npm run build:firefox`.
-- Public pages were opened directly with `?tab=overview` for user profiles.
-- The in-app browser adapter used for this audit did not expose viewport resizing, so narrow viewport remains on the manual release checklist.
+- macOS 26.5.2, unauthenticated GitHub session.
+- Public pages were fetched with `curl -L --compressed` using a browser user agent.
+- Public profile overviews lazy-load the contribution graph through an `include-fragment`.
+- The stable public fragment endpoint for the current graph is `https://github.com/users/octocat/contributions`.
 
 Observed selectors:
 
 | Profile type | URL | Graph result |
 | --- | --- | --- |
-| Normal public user profile | `https://github.com/octocat?tab=overview` | Contribution graph present; 367 `td.ContributionCalendar-day` cells, 372 `.ContributionCalendar-day` elements, 367 `data-date` cells, 372 `data-level` elements, 0 `rect.ContributionCalendar-day` cells. |
-| High-activity public user profile | `https://github.com/torvalds?tab=overview` | Contribution graph present; same table-based calendar shape as the normal public profile. |
-| Organization profile | `https://github.com/openai` | No personal contribution graph, expected no-op target. |
-| Missing profile | `https://github.com/this-user-should-not-exist-commit-arcade-audit-2026` | No contribution graph, expected no-op target. |
+| Normal public user profile | `https://github.com/octocat?tab=overview` | Overview page exposes a lazy `include-fragment`; graph is loaded from `/users/octocat/contributions`. |
+| Normal public contribution fragment | `https://github.com/users/octocat/contributions` | Contribution graph present; 367 `td.ContributionCalendar-day[data-date][data-level]` cells in `extension/shared/test/fixtures/github/octocat-contributions.html`. |
+| Organization profile | `https://github.com/openai` | No personal contribution graph, expected no-op target. Captured in `extension/shared/test/fixtures/github/openai-organization-overview.html`. |
+| Missing graph fixture | local fixture | No contribution graph, expected no-op target. Captured in `extension/shared/test/fixtures/github/missing-contribution-graph.html`. |
+| Empty graph fixture | local fixture | Contribution graph exists with all zero-intensity cells. Captured in `extension/shared/test/fixtures/github/empty-contribution-graph.html`. |
+| Narrow graph fixture | local fixture | Contribution graph exists in compact table markup. Captured in `extension/shared/test/fixtures/github/narrow-contribution-graph.html`. |
 
 Findings:
 
 - GitHub's current public profile graph is table-based, not SVG-based.
-- The graph remains contribution-labeled through `.js-yearly-contributions`, `.js-calendar-graph`, `Contribution Graph` text, and `tool-tip[for^="contribution-day"]`.
-- The extension selector path that includes `[data-date][data-level]` is required for the current production DOM.
+- The graph remains contribution-labeled through `.js-yearly-contributions`, `.js-calendar-graph`, `.ContributionCalendar-grid`, and `td.ContributionCalendar-day`.
+- The extension selector path that includes `[data-date][data-level]` is required for the current production DOM; relying only on SVG `rect` would miss the 2026-08-11 GitHub markup.
 - Organization and missing-profile pages do not expose a personal graph and should not receive a Commit Arcade button.
+- Tests cover current public markup, legacy SVG markup, empty graphs, narrow table-like graphs, unrelated date rectangles, and no-graph pages.
 
 ### Missing or Unsupported Graph
 

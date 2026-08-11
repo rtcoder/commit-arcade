@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 import { findContributionGraph } from './githubContributionGraph';
+
+const ROOT = process.cwd();
+
+async function fixture(name: string) {
+  return readFile(path.join(ROOT, 'extension', 'shared', 'test', 'fixtures', 'github', name), 'utf8');
+}
 
 describe('findContributionGraph', () => {
   it('detects SVG contribution cells, preserving row and column coordinates', () => {
@@ -87,5 +95,40 @@ describe('findContributionGraph', () => {
       [1, 0, 2],
       [1, 1, 3],
     ]);
+  });
+
+  it('detects the current public GitHub contribution fragment fixture', async () => {
+    document.body.innerHTML = await fixture('octocat-contributions.html');
+
+    const graph = findContributionGraph(document);
+
+    expect(graph).not.toBeNull();
+    expect(graph?.cells.length).toBeGreaterThan(300);
+    expect(graph?.size.rows).toBeGreaterThanOrEqual(7);
+    expect(graph?.size.columns).toBeGreaterThanOrEqual(50);
+  });
+
+  it('keeps empty contribution graphs playable with zero intensity cells', async () => {
+    document.body.innerHTML = await fixture('empty-contribution-graph.html');
+
+    const graph = findContributionGraph(document);
+
+    expect(graph?.cells).toHaveLength(4);
+    expect(graph?.cells.every((cell) => cell.intensity === 0)).toBe(true);
+  });
+
+  it('detects narrow table-like contribution graph fixtures', async () => {
+    document.body.innerHTML = await fixture('narrow-contribution-graph.html');
+
+    const graph = findContributionGraph(document);
+
+    expect(graph?.size).toEqual({ rows: 2, columns: 3 });
+    expect(graph?.cells.map((cell) => cell.intensity)).toEqual([0, 1, 2, 3, 4, 0]);
+  });
+
+  it('no-ops for public organization pages without contribution graph cells', async () => {
+    document.body.innerHTML = await fixture('missing-contribution-graph.html');
+
+    expect(findContributionGraph(document)).toBeNull();
   });
 });
