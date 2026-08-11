@@ -16,10 +16,15 @@ export async function createExtensionArchive({ buildDir, distDir, target, versio
   await mkdir(distDir, { recursive: true });
   const normalizedVersion = version.startsWith('v') ? version : `v${version}`;
   const archivePath = path.join(distDir, `commit-arcade-${target}-${normalizedVersion}.zip`);
-  const archive = await buildZip(entries, buildDir);
+  await createDeterministicZip({ archivePath, entries, root: buildDir });
+  return { archivePath, entries };
+}
+
+export async function createDeterministicZip({ archivePath, entries, root }) {
+  await mkdir(path.dirname(archivePath), { recursive: true });
+  const archive = await buildZip(entries, root);
   await rm(archivePath, { force: true });
   await writeFile(archivePath, archive);
-  return { archivePath, entries };
 }
 
 async function listFiles(root, prefix = '') {
