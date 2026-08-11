@@ -5,15 +5,29 @@ interface FlappyOptions {
   gapSize?: number;
   gapStart?: number;
   initialBarrierColumn?: number;
+  seed?: number;
 }
+
+interface Barrier {
+  column: number;
+  gapStart: number;
+  scored: boolean;
+}
+
+const PLAYER_COLUMN = 1;
+const BARRIER_SPEED_COLUMNS_PER_SECOND = 2.6;
+const GRAVITY_ROWS_PER_SECOND = 10;
+const FLAP_VELOCITY_ROWS_PER_SECOND = -5;
+const BARRIER_SPACING = 8;
 
 export function createFlappyGame(options: FlappyOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
   let size: BoardSize = { rows: 1, columns: 1 };
   let playerRow = 0;
   let velocity = 0;
-  let barrierColumn = 0;
-  let scored = false;
+  let barriers: Barrier[] = [];
+  let score = 0;
+  let randomState = normalizeSeed(options.seed ?? 1);
   let stopped = false;
 
   return {
@@ -26,39 +40,49 @@ export function createFlappyGame(options: FlappyOptions = {}): CommitArcadeGame 
       size = nextContext.size;
       playerRow = Math.floor(size.rows / 2);
       velocity = 0;
-      barrierColumn = options.initialBarrierColumn ?? size.columns - 1;
-      scored = false;
+      score = 0;
+      randomState = normalizeSeed(options.seed ?? 1);
+      barriers = [createBarrier(options.initialBarrierColumn ?? size.columns - 1)];
       stopped = false;
     },
     update(deltaMs): void {
       if (stopped) {
         return;
       }
-      velocity += deltaMs / 300;
-      playerRow = clamp(Math.round(playerRow + velocity), 0, size.rows - 1);
-      const shift = Math.max(1, Math.floor(deltaMs / 500));
-      barrierColumn -= shift;
-      if (!scored && barrierColumn < 1) {
-        scored = true;
-        context?.onScore?.(1);
+      const seconds = Math.max(0, deltaMs) / 1000;
+      playerRow = clamp(playerRow + velocity * seconds, 0, size.rows - 1);
+      velocity += GRAVITY_ROWS_PER_SECOND * seconds;
+      barriers = barriers.map((barrier) => ({ ...barrier, column: barrier.column - BARRIER_SPEED_COLUMNS_PER_SECOND * seconds }));
+      for (const barrier of barriers) {
+        if (!barrier.scored && barrier.column < PLAYER_COLUMN) {
+          barrier.scored = true;
+          score += 1;
+          context?.onScore?.(score);
+        }
       }
-      if (barrierColumn === 1 && !isInGap(playerRow)) {
+      barriers = barriers.filter((barrier) => barrier.column >= -1);
+      spawnBarrierIfNeeded();
+      if (barriers.some((barrier) => Math.round(barrier.column) === PLAYER_COLUMN && !isInGap(Math.round(playerRow), barrier))) {
         stopped = true;
         context?.onGameOver?.();
       }
     },
     handleInput(input): void {
       if (input.type === 'down' && (input.key === 'ArrowUp' || input.key === ' ' || input.key === 'Space')) {
-        velocity = -1;
+        velocity = FLAP_VELOCITY_ROWS_PER_SECOND;
       }
     },
     render(renderer: BoardRenderer): void {
       const frame = createEmptyFrame(size);
-      frame[playerRow]![1] = 'player';
-      if (barrierColumn >= 0 && barrierColumn < size.columns) {
+      frame[Math.round(playerRow)]![PLAYER_COLUMN] = 'player';
+      for (const barrier of barriers) {
+        const renderedColumn = Math.round(barrier.column);
+        if (renderedColumn < 0 || renderedColumn >= size.columns) {
+          continue;
+        }
         for (let row = 0; row < size.rows; row += 1) {
-          if (!isInGap(row)) {
-            frame[row]![barrierColumn] = 'obstacle';
+          if (!isInGap(row, barrier)) {
+            frame[row]![renderedColumn] = 'obstacle';
           }
         }
       }
@@ -69,11 +93,52 @@ export function createFlappyGame(options: FlappyOptions = {}): CommitArcadeGame 
     },
   };
 
-  function isInGap(row: number): boolean {
-    const gapStart = options.gapStart ?? 1;
-    const gapSize = options.gapSize ?? 2;
-    return row >= gapStart && row < gapStart + gapSize;
+  function spawnBarrierIfNeeded(): void {
+    const rightmostColumn = barriers.reduce((rightmost, barrier) => Math.max(rightmost, barrier.column), -Infinity);
+    if (rightmostColumn <= size.columns - BARRIER_SPACING) {
+      barriers.push(createBarrier(size.columns - 1));
+    }
   }
+
+  function createBarrier(column: number): Barrier {
+    return {
+      column,
+      gapStart: options.gapStart ?? nextGapStart(),
+      scored: false,
+    };
+  }
+
+  function nextGapStart(): number {
+    return nextRandomInt() % maxGapStart();
+  }
+
+  function maxGapStart(): number {
+    return Math.max(1, size.rows - gapSize() + 1);
+  }
+
+  function gapSize(): number {
+    return clamp(options.gapSize ?? Math.max(2, Math.min(3, size.rows - 2)), 1, size.rows);
+  }
+
+  function isInGap(row: number, barrier: Barrier): boolean {
+    const gapStart = clamp(barrier.gapStart, 0, Math.max(0, size.rows - gapSize()));
+    const gapSizeValue = gapSize();
+    return row >= gapStart && row < gapStart + gapSizeValue;
+  }
+
+  function nextRandomInt(): number {
+    randomState ^= randomState << 13;
+    randomState >>>= 0;
+    randomState ^= randomState >>> 17;
+    randomState >>>= 0;
+    randomState ^= randomState << 5;
+    randomState >>>= 0;
+    return randomState;
+  }
+}
+
+function normalizeSeed(seed: number): number {
+  return Number.isInteger(seed) ? seed >>> 0 : 1;
 }
 
 function clamp(value: number, min: number, max: number): number {
