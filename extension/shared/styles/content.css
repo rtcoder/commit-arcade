@@ -74,6 +74,42 @@
   padding: 4px 8px;
 }
 
+.commit-arcade-session {
+  align-items: center;
+  background: var(--color-canvas-overlay, #ffffff);
+  border: 1px solid var(--color-border-default, #d0d7de);
+  border-radius: 6px;
+  color: var(--color-fg-default, #24292f);
+  display: flex;
+  flex-wrap: wrap;
+  font: inherit;
+  gap: 6px;
+  margin: 0 0 6px;
+  max-width: min(100%, 640px);
+  padding: 4px 6px;
+}
+
+.commit-arcade-session-title {
+  font-weight: 600;
+}
+
+.commit-arcade-session-button {
+  background: var(--color-btn-bg, #f6f8fa);
+  border: 1px solid var(--color-border-default, #d0d7de);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  min-height: 26px;
+  padding: 2px 7px;
+}
+
+.commit-arcade-session-button:hover,
+.commit-arcade-session-button:focus-visible {
+  background: var(--color-accent-subtle, #ddf4ff);
+  outline: none;
+}
+
 .commit-arcade-cell[data-commit-arcade-state='player'] {
   fill: var(--commit-arcade-player);
 }

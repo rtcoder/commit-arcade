@@ -28,6 +28,11 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeFrame = 0;
   let lastFrameTime = 0;
   let activeButton: HTMLButtonElement | null = null;
+  let activeGame: GameMetadata | null = null;
+  let activeScore = 0;
+  let activeStatus = 'Ready';
+  let activeSession: HTMLElement | null = null;
+  const highScores: Record<string, number> = {};
 
   installGraph();
   root.addEventListener('turbo:render', rescanGraph, { signal: abortController.signal });
@@ -56,7 +61,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     button.setAttribute('aria-label', 'Play Commit Arcade');
     button.textContent = '▶ Play';
     button.addEventListener('click', () => {
-      if (activeEngine !== null) {
+      if (activeEngine !== null || activeSession !== null) {
         stopGame(button);
         return;
       }
@@ -96,7 +101,18 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       return;
     }
     graph.container.querySelector('.commit-arcade-picker')?.remove();
+    activeGame = playableGame;
+    activeScore = 0;
+    activeStatus = 'Playing';
     activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
+    activeSession = showSession(root, graph.container, ownedElements, {
+      game: playableGame,
+      highScore: highScores[game.id] ?? 0,
+      onRestart: () => restartGame(button),
+      onStop: () => stopGame(button),
+      score: activeScore,
+      status: activeStatus,
+    });
     const renderer = createBoardRenderer(graph);
     activeEngine = createGameEngine({
       renderer,
@@ -105,7 +121,18 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         stopGame(button);
         showMessage(root, graph.container, ownedElements, 'Game over. Commit Arcade restored the graph.');
       },
-      onGameOver: () => inputManager.deactivate(),
+      onGameOver: () => {
+        activeStatus = 'Game over';
+        inputManager.deactivate();
+        activeEngine?.stop();
+        activeEngine = null;
+        renderSession();
+      },
+      onScore: (score) => {
+        activeScore = score;
+        highScores[game.id] = Math.max(highScores[game.id] ?? 0, score);
+        renderSession();
+      },
     });
     inputManager.activate(usedKeysForGame(game.id), (input) => {
       if (input.type === 'down' && input.key === 'Escape') {
@@ -115,7 +142,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       activeEngine?.handleInput(input);
     });
     activeEngine.start(playableGame);
-    activeEngine.tick(0);
+    activeEngine?.tick(0);
     button.textContent = '■ Stop';
     button.setAttribute('aria-label', 'Stop Commit Arcade');
     activeButton = button;
@@ -137,9 +164,22 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       activeSnapshot = null;
     }
     root.querySelector('.commit-arcade-picker')?.remove();
+    activeSession?.remove();
+    activeSession = null;
+    activeGame = null;
+    activeScore = 0;
+    activeStatus = 'Ready';
     if (button !== null) {
       button.textContent = '▶ Play';
       button.setAttribute('aria-label', 'Play Commit Arcade');
+    }
+  }
+
+  function restartGame(button: HTMLButtonElement): void {
+    const game = activeGame;
+    stopGame(button);
+    if (game !== null) {
+      startGame(game, button);
     }
   }
 
@@ -156,6 +196,24 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     if (activeEngine?.isRunning() === true) {
       activeFrame = view.requestAnimationFrame(tick);
     }
+  }
+
+  function renderSession(): void {
+    if (activeSession === null || activeGame === null) {
+      return;
+    }
+    renderSessionContent(activeSession, {
+      game: activeGame,
+      highScore: highScores[activeGame.id] ?? activeScore,
+      onRestart: () => {
+        if (activeButton !== null) {
+          restartGame(activeButton);
+        }
+      },
+      onStop: () => stopGame(activeButton),
+      score: activeScore,
+      status: activeStatus,
+    });
   }
 }
 
@@ -224,6 +282,57 @@ function showMessage(root: Document, container: Element, ownedElements: Element[
   message.textContent = text;
   container.insertAdjacentElement('afterbegin', message);
   ownedElements.push(message);
+}
+
+interface SessionViewModel {
+  game: GameMetadata;
+  highScore: number;
+  onRestart: () => void;
+  onStop: () => void;
+  score: number;
+  status: string;
+}
+
+function showSession(root: Document, container: Element, ownedElements: Element[], model: SessionViewModel): HTMLElement {
+  container.querySelector('.commit-arcade-session')?.remove();
+  const session = root.createElement('div');
+  session.className = 'commit-arcade-session';
+  session.setAttribute('role', 'status');
+  renderSessionContent(session, model);
+  container.insertAdjacentElement('afterbegin', session);
+  ownedElements.push(session);
+  return session;
+}
+
+function renderSessionContent(session: HTMLElement, model: SessionViewModel): void {
+  session.replaceChildren();
+
+  const title = session.ownerDocument.createElement('span');
+  title.className = 'commit-arcade-session-title';
+  title.textContent = model.game.name;
+
+  const score = session.ownerDocument.createElement('span');
+  score.textContent = `Score ${model.score}`;
+
+  const best = session.ownerDocument.createElement('span');
+  best.textContent = `Best ${model.highScore}`;
+
+  const status = session.ownerDocument.createElement('span');
+  status.textContent = model.status;
+
+  const restart = session.ownerDocument.createElement('button');
+  restart.type = 'button';
+  restart.className = 'commit-arcade-session-button commit-arcade-restart-button';
+  restart.textContent = 'Restart';
+  restart.addEventListener('click', model.onRestart);
+
+  const stop = session.ownerDocument.createElement('button');
+  stop.type = 'button';
+  stop.className = 'commit-arcade-session-button commit-arcade-stop-button';
+  stop.textContent = 'Stop';
+  stop.addEventListener('click', model.onStop);
+
+  session.append(title, score, best, status, restart, stop);
 }
 
 function usedKeysForGame(gameId: string): ReadonlySet<string> {
