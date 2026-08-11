@@ -63,6 +63,17 @@
   cursor: not-allowed;
 }
 
+.commit-arcade-message {
+  background: var(--color-attention-subtle, #fff8c5);
+  border: 1px solid var(--color-attention-muted, #d4a72c);
+  border-radius: 6px;
+  color: var(--color-fg-default, #24292f);
+  display: inline-block;
+  font: inherit;
+  margin: 0 0 6px;
+  padding: 4px 8px;
+}
+
 .commit-arcade-cell[data-commit-arcade-state='player'] {
   fill: var(--commit-arcade-player);
 }
