@@ -93,6 +93,10 @@
   font-weight: 600;
 }
 
+.commit-arcade-controls-help {
+  color: var(--commit-arcade-dim);
+}
+
 .commit-arcade-session-button {
   background: var(--color-btn-bg, #f6f8fa);
   border: 1px solid var(--color-border-default, #d0d7de);

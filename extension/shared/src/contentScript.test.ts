@@ -176,6 +176,56 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 
+  it('starts a selected game from the picker with keyboard activation and accessible labels', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="0" x="12" y="0"></rect>
+        </svg>
+      </section>
+    `;
+
+    const controller = initializeCommitArcade(document);
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    const snake = Array.from(document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')).find((item) =>
+      item.textContent?.includes('Snake'),
+    );
+
+    expect(snake?.getAttribute('aria-label')).toBe('Start Snake. Classic panoramic Snake inside the contribution grid.');
+
+    snake?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' }));
+
+    expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Snake');
+
+    controller.destroy();
+  });
+
+  it('shows compact controls help for the active game without replacing the graph', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="0" x="0" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="0" x="12" y="0"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-03" data-level="0" x="0" y="12"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-04" data-level="0" x="12" y="12"></rect>
+        </svg>
+      </section>
+    `;
+
+    const controller = initializeCommitArcade(document);
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    const help = document.querySelector<HTMLElement>('.commit-arcade-controls-help');
+
+    expect(help?.textContent).toContain('Jump');
+    expect(help?.textContent).toContain('Esc stops');
+    expect(document.querySelectorAll('rect')).toHaveLength(4);
+
+    controller.destroy();
+  });
+
   it('updates the session HUD score and exposes Restart and Stop after game over', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">
