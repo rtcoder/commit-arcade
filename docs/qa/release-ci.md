@@ -1,6 +1,6 @@
 # Release CI
 
-The release workflow runs on version tag pushes such as `v1.0.0` and can also be started manually. Tag pushes use the tag name for artifact and ZIP names.
+The release workflow runs on version tag pushes such as `v1.0.0`. Tag pushes use the tag name for artifact, ZIP and GitHub Release names.
 
 Package and source manifest versions are `1.0.0` for the v1 release. Generated build manifests are stamped from `package.json` so release packages use the package version as the source of truth.
 
@@ -26,7 +26,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The `Build Extensions` workflow uploads predictable artifacts:
+The `Build Extensions` workflow uploads predictable Actions artifacts and attaches the same ZIP files to the matching GitHub Release:
 
 - `commit-arcade-chrome-v1.0.0` containing `commit-arcade-chrome-v1.0.0.zip`
 - `commit-arcade-firefox-v1.0.0` containing `commit-arcade-firefox-v1.0.0.zip`

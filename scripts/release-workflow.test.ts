@@ -12,6 +12,7 @@ describe('release workflow', () => {
     expect(workflow).toContain('push:');
     expect(workflow).toContain('tags:');
     expect(workflow).toContain("'v*'");
+    expect(workflow).toContain('contents: write');
     expect(workflow).toContain('actions/checkout@v7');
     expect(workflow).toContain('actions/setup-node@v7');
     expect(workflow).toContain('actions/upload-artifact@v7');
@@ -28,6 +29,10 @@ describe('release workflow', () => {
     expect(workflow).toContain('dist/commit-arcade-firefox-${{ github.ref_name }}.zip');
     expect(workflow).toContain('commit-arcade-firefox-source-${{ github.ref_name }}');
     expect(workflow).toContain('dist/commit-arcade-firefox-source-${{ github.ref_name }}.zip');
+    expect(workflow).toContain('gh release create "${GITHUB_REF_NAME}"');
+    expect(workflow).toContain('gh release edit "${GITHUB_REF_NAME}"');
+    expect(workflow).toContain('gh release upload "${GITHUB_REF_NAME}"');
+    expect(workflow).toContain('--clobber');
   });
 
   it('documents the v1.0.0 release tag flow', async () => {
