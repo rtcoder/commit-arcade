@@ -2,15 +2,22 @@ import { createEmptyFrame, type BoardCoordinate, type BoardSize } from '../../co
 import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
 
 interface SnakeOptions {
+  foodSequence?: BoardCoordinate[];
+  initialDirection?: BoardCoordinate;
   initialFood?: BoardCoordinate;
+  initialSnake?: BoardCoordinate[];
 }
+
+const STEP_MS = 220;
 
 export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
   let size: BoardSize = { rows: 1, columns: 1 };
   let snake: BoardCoordinate[] = [];
   let direction: BoardCoordinate = { row: 0, column: 1 };
+  let queuedDirection: BoardCoordinate | null = null;
   let food: BoardCoordinate = { row: 0, column: 0 };
+  let foodSequenceIndex = 0;
   let score = 0;
   let stopped = false;
   let accumulatedMs = 0;
@@ -23,9 +30,11 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
     start(nextContext): void {
       context = nextContext;
       size = nextContext.size;
-      snake = [{ row: Math.floor(size.rows / 2), column: Math.min(2, size.columns - 1) }];
-      direction = { row: 0, column: 1 };
-      food = options.initialFood ?? { row: snake[0]!.row, column: Math.min(snake[0]!.column + 2, size.columns - 1) };
+      snake = options.initialSnake?.map((segment) => ({ ...segment })) ?? [{ row: Math.floor(size.rows / 2), column: Math.min(2, size.columns - 1) }];
+      direction = options.initialDirection ?? { row: 0, column: 1 };
+      queuedDirection = null;
+      foodSequenceIndex = 0;
+      food = options.initialFood ?? nextFood();
       score = 0;
       stopped = false;
       accumulatedMs = 0;
@@ -35,8 +44,8 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
         return;
       }
       accumulatedMs += deltaMs;
-      while (accumulatedMs >= 250 && !stopped) {
-        accumulatedMs -= 250;
+      while (accumulatedMs >= STEP_MS && !stopped) {
+        accumulatedMs -= STEP_MS;
         step();
       }
     },
@@ -45,8 +54,8 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
         return;
       }
       const next = directionForKey(input.key);
-      if (next !== null && (next.row + direction.row !== 0 || next.column + direction.column !== 0)) {
-        direction = next;
+      if (next !== null && queuedDirection === null && !isReverse(next, direction)) {
+        queuedDirection = next;
       }
     },
     render(renderer): void {
@@ -63,6 +72,10 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
   };
 
   function step(): void {
+    if (queuedDirection !== null) {
+      direction = queuedDirection;
+      queuedDirection = null;
+    }
     const head = snake[0]!;
     const next = { row: head.row + direction.row, column: head.column + direction.column };
     if (isOutOfBounds(next) || snake.some((segment) => segment.row === next.row && segment.column === next.column)) {
@@ -74,16 +87,23 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
     if (next.row === food.row && next.column === food.column) {
       score += 1;
       context?.onScore?.(score);
-      food = firstEmptyCell();
+      food = nextFood();
     } else {
       snake.pop();
     }
   }
 
-  function firstEmptyCell(): BoardCoordinate {
+  function nextFood(): BoardCoordinate {
+    while (foodSequenceIndex < (options.foodSequence?.length ?? 0)) {
+      const candidate = options.foodSequence![foodSequenceIndex]!;
+      foodSequenceIndex += 1;
+      if (!isOnSnake(candidate) && !isOutOfBounds(candidate)) {
+        return { ...candidate };
+      }
+    }
     for (let row = 0; row < size.rows; row += 1) {
       for (let column = 0; column < size.columns; column += 1) {
-        if (!snake.some((segment) => segment.row === row && segment.column === column)) {
+        if (!isOnSnake({ row, column })) {
           return { row, column };
         }
       }
@@ -94,6 +114,14 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
   function isOutOfBounds(coordinate: BoardCoordinate): boolean {
     return coordinate.row < 0 || coordinate.row >= size.rows || coordinate.column < 0 || coordinate.column >= size.columns;
   }
+
+  function isOnSnake(coordinate: BoardCoordinate): boolean {
+    return snake.some((segment) => segment.row === coordinate.row && segment.column === coordinate.column);
+  }
+}
+
+function isReverse(next: BoardCoordinate, current: BoardCoordinate): boolean {
+  return next.row + current.row === 0 && next.column + current.column === 0;
 }
 
 function directionForKey(key: string): BoardCoordinate | null {

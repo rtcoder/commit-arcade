@@ -21,4 +21,57 @@ describe('createSnakeGame', () => {
 
     expect(gameOver).toBe(true);
   });
+
+  it('buffers one direction change per tick and ignores immediate reverse input', () => {
+    const game = createSnakeGame({ initialFood: { row: 0, column: 0 } });
+    const renderer = createTestRenderer();
+
+    game.start({ size: { rows: 5, columns: 8 } });
+    game.handleInput({ key: 'ArrowLeft', type: 'down' });
+    game.handleInput({ key: 's', type: 'down' });
+    game.handleInput({ key: 'a', type: 'down' });
+    game.update(250);
+    game.render(renderer);
+
+    expect(cellAt(renderer.lastFrame, 3, 2)).toBe('player');
+    expect(cellAt(renderer.lastFrame, 2, 2)).toBe('empty');
+  });
+
+  it('keeps spawned food off the snake after growth', () => {
+    const game = createSnakeGame({ foodSequence: [{ row: 2, column: 3 }, { row: 2, column: 2 }, { row: 0, column: 0 }] });
+    const renderer = createTestRenderer();
+
+    game.start({ size: { rows: 5, columns: 8 } });
+    game.update(250);
+    game.render(renderer);
+
+    expect(cellAt(renderer.lastFrame, 2, 2)).toBe('player');
+    expect(cellAt(renderer.lastFrame, 0, 0)).toBe('bonus');
+  });
+
+  it('ends when the snake collides with itself', () => {
+    let gameOver = false;
+    const game = createSnakeGame({
+      initialSnake: [
+        { row: 2, column: 2 },
+        { row: 3, column: 2 },
+        { row: 3, column: 3 },
+        { row: 2, column: 3 },
+      ],
+      initialDirection: { row: -1, column: 0 },
+      initialFood: { row: 0, column: 0 },
+    });
+
+    game.start({ size: { rows: 5, columns: 8 }, onGameOver: () => (gameOver = true) });
+    game.handleInput({ key: 'ArrowRight', type: 'down' });
+    game.handleInput({ key: 'ArrowDown', type: 'down' });
+    game.update(250);
+    game.update(250);
+
+    expect(gameOver).toBe(true);
+  });
 });
+
+function cellAt(frame: ReturnType<typeof createTestRenderer>['lastFrame'], row: number, column: number): string | undefined {
+  return frame?.[row]?.[column];
+}
