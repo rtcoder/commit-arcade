@@ -88,10 +88,17 @@ describe('initializeCommitArcade', () => {
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
     document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
 
+    const arcadeBoard = document.querySelector<HTMLElement>('.commit-arcade-board');
+
+    expect(arcadeBoard).not.toBeNull();
+    expect(arcadeBoard?.style.getPropertyValue('--commit-arcade-board-rows')).toBe('21');
+    expect(arcadeBoard?.style.getPropertyValue('--commit-arcade-board-columns')).toBe('2');
+    expect(document.querySelectorAll('.commit-arcade-board-cell')).toHaveLength(42);
     expect(document.querySelector('[data-commit-arcade-state="player"]')).not.toBeNull();
 
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
 
+    expect(document.querySelector('.commit-arcade-board')).toBeNull();
     expect(document.querySelector('[data-commit-arcade-state]')).toBeNull();
     expect(document.querySelector('rect')?.getAttribute('fill')).toBe('#ebedf0');
 
@@ -250,7 +257,7 @@ describe('initializeCommitArcade', () => {
   });
 
   it('starts newly shipped games from playable picker entries', () => {
-    document.body.innerHTML = contributionGraphFixture();
+    document.body.innerHTML = wideContributionGraphFixture();
 
     const controller = initializeCommitArcade(document);
     for (const gameName of [
@@ -549,6 +556,17 @@ function contributionGraphFixture(): string {
         <rect class="ContributionCalendar-day" data-date="2026-01-03" data-level="0" x="0" y="12" fill="#ebedf0"></rect>
         <rect class="ContributionCalendar-day" data-date="2026-01-04" data-level="0" x="12" y="12" fill="#ebedf0"></rect>
       </svg>
+    </section>
+  `;
+}
+
+function wideContributionGraphFixture(): string {
+  const cells = Array.from({length: 12}, (_, column) =>
+    `<rect class="ContributionCalendar-day" data-date="2026-01-${String(column + 1).padStart(2, '0')}" data-level="0" x="${column * 12}" y="0" fill="#ebedf0"></rect>`,
+  ).join('');
+  return `
+    <section aria-label="Contribution Graph">
+      <svg>${cells}</svg>
     </section>
   `;
 }

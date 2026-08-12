@@ -93,6 +93,8 @@ describe('theme and responsive QA assets', () => {
 
     expect(css).toContain('.commit-arcade-picker-item:focus-visible');
     expect(css).toContain('.commit-arcade-session-button:focus-visible');
+    expect(css).toContain('.commit-arcade-board');
+    expect(css).toContain('.commit-arcade-board-cell');
     expect(css).toContain('@media (max-width: 480px)');
     expect(css).toContain('max-width: min(220px, calc(100vw - 32px))');
     expect(qa).toContain('GitHub light theme');

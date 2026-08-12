@@ -1,3 +1,4 @@
+import {type ArcadeBoard, createArcadeBoard} from '../core/arcadeBoard';
 import {createBoardRenderer} from '../core/boardRenderer';
 import {createGameEngine, type GameEngine} from '../core/gameEngine';
 import {gameRegistry} from '../core/gameRegistry';
@@ -58,6 +59,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeGame: GameMetadata | null = null;
   let activeScore = 0;
   let activeStatus = 'Ready';
+  let activeArcadeBoard: ArcadeBoard | null = null;
   let activeSession: HTMLElement | null = null;
   const highScores: Record<string, number> = {};
   let selectedGame = 'runner';
@@ -161,10 +163,12 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       score: activeScore,
       status: activeStatus,
     });
-    const renderer = createBoardRenderer(graph);
+    activeArcadeBoard = createArcadeBoard(root, graph);
+    activeSession.insertAdjacentElement('afterend', activeArcadeBoard.element);
+    const renderer = createBoardRenderer(activeArcadeBoard.graph);
     activeEngine = createGameEngine({
       renderer,
-      size: graph.size,
+      size: activeArcadeBoard.graph.size,
       onError: () => {
         stopGame(button);
         showMessage(root, graph.container, ownedElements, 'Game over. Commit Arcade restored the graph.');
@@ -212,6 +216,8 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
     }
+    activeArcadeBoard?.destroy();
+    activeArcadeBoard = null;
     activeGraph?.container.classList.remove(ACTIVE_GRAPH_CLASS);
     root.querySelector('.commit-arcade-picker')?.remove();
     activeSession?.remove();

@@ -122,6 +122,22 @@
     outline-offset: 2px;
 }
 
+.commit-arcade-board {
+    display: grid;
+    gap: 2px;
+    grid-template-columns: repeat(var(--commit-arcade-board-columns), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--commit-arcade-board-rows), minmax(0, 1fr));
+    margin: 8px 0;
+    max-width: 100%;
+}
+
+.commit-arcade-board-cell {
+    aspect-ratio: 1;
+    background-color: var(--contribution-default-bgColor-0, var(--commit-arcade-empty));
+    border-radius: 2px;
+    min-width: 0;
+}
+
 @media (max-width: 480px) {
     .commit-arcade-picker {
         position: static;
