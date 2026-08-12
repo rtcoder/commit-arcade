@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
-  <title id="title">Commit Arcade mark</title>
-  <desc id="desc">A compact terminal prompt and play mark for Commit Arcade.</desc>
-  <g fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="8">
-    <path d="M18 36 48 52 18 68"/>
-    <path d="M54 76h28"/>
-    <path d="M78 34v44l34-22z" fill="currentColor" stroke="none"/>
-  </g>
+    <title id="title">Commit Arcade mark</title>
+    <desc id="desc">A compact terminal prompt and play mark for Commit Arcade.</desc>
+    <g fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="8">
+        <path d="M18 36 48 52 18 68"/>
+        <path d="M54 76h28"/>
+        <path d="M78 34v44l34-22z" fill="currentColor" stroke="none"/>
+    </g>
 </svg>

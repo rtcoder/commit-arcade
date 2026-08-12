@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" role="img" aria-labelledby="title desc"><title id="title">Commit Arcade 16 icon</title><desc id="desc">Compact Commit Arcade play mark.</desc><path fill="currentColor" d="M1 3h2l3 5-3 5H1l3-5-3-5Zm6 8h4v2H7v-2Zm3-8v8l5-4-5-4Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" role="img" aria-labelledby="title desc">
+    <title id="title">Commit Arcade 16 icon</title>
+    <desc id="desc">Compact Commit Arcade play mark.</desc>
+    <path fill="currentColor" d="M1 3h2l3 5-3 5H1l3-5-3-5Zm6 8h4v2H7v-2Zm3-8v8l5-4-5-4Z"/>
+</svg>

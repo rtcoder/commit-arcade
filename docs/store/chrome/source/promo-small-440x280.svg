@@ -1,37 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280">
-  <rect width="440" height="280" fill="#f6f8fa"/>
-  <rect x="24" y="24" width="392" height="232" rx="18" fill="#0d1117"/>
-  <rect x="48" y="52" width="216" height="22" rx="5" fill="#f0f6fc"/>
-  <rect x="48" y="90" width="236" height="12" rx="4" fill="#3fb950"/>
-  <g transform="translate(48 132)">
-    <g fill="#21262d">
-      <rect x="0" y="0" width="22" height="22" rx="4"/>
-      <rect x="30" y="0" width="22" height="22" rx="4"/>
-      <rect x="60" y="0" width="22" height="22" rx="4"/>
-      <rect x="90" y="0" width="22" height="22" rx="4"/>
-      <rect x="120" y="0" width="22" height="22" rx="4"/>
-      <rect x="150" y="0" width="22" height="22" rx="4"/>
-      <rect x="180" y="0" width="22" height="22" rx="4"/>
-      <rect x="210" y="0" width="22" height="22" rx="4"/>
-      <rect x="240" y="0" width="22" height="22" rx="4"/>
-      <rect x="270" y="0" width="22" height="22" rx="4"/>
-      <rect x="300" y="0" width="22" height="22" rx="4"/>
-      <rect x="0" y="30" width="22" height="22" rx="4"/>
-      <rect x="30" y="30" width="22" height="22" rx="4"/>
-      <rect x="60" y="30" width="22" height="22" rx="4"/>
-      <rect x="90" y="30" width="22" height="22" rx="4"/>
-      <rect x="120" y="30" width="22" height="22" rx="4"/>
-      <rect x="150" y="30" width="22" height="22" rx="4"/>
-      <rect x="180" y="30" width="22" height="22" rx="4"/>
-      <rect x="210" y="30" width="22" height="22" rx="4"/>
-      <rect x="240" y="30" width="22" height="22" rx="4"/>
-      <rect x="270" y="30" width="22" height="22" rx="4"/>
-      <rect x="300" y="30" width="22" height="22" rx="4"/>
+    <rect width="440" height="280" fill="#f6f8fa"/>
+    <rect x="24" y="24" width="392" height="232" rx="18" fill="#0d1117"/>
+    <rect x="48" y="52" width="216" height="22" rx="5" fill="#f0f6fc"/>
+    <rect x="48" y="90" width="236" height="12" rx="4" fill="#3fb950"/>
+    <g transform="translate(48 132)">
+        <g fill="#21262d">
+            <rect x="0" y="0" width="22" height="22" rx="4"/>
+            <rect x="30" y="0" width="22" height="22" rx="4"/>
+            <rect x="60" y="0" width="22" height="22" rx="4"/>
+            <rect x="90" y="0" width="22" height="22" rx="4"/>
+            <rect x="120" y="0" width="22" height="22" rx="4"/>
+            <rect x="150" y="0" width="22" height="22" rx="4"/>
+            <rect x="180" y="0" width="22" height="22" rx="4"/>
+            <rect x="210" y="0" width="22" height="22" rx="4"/>
+            <rect x="240" y="0" width="22" height="22" rx="4"/>
+            <rect x="270" y="0" width="22" height="22" rx="4"/>
+            <rect x="300" y="0" width="22" height="22" rx="4"/>
+            <rect x="0" y="30" width="22" height="22" rx="4"/>
+            <rect x="30" y="30" width="22" height="22" rx="4"/>
+            <rect x="60" y="30" width="22" height="22" rx="4"/>
+            <rect x="90" y="30" width="22" height="22" rx="4"/>
+            <rect x="120" y="30" width="22" height="22" rx="4"/>
+            <rect x="150" y="30" width="22" height="22" rx="4"/>
+            <rect x="180" y="30" width="22" height="22" rx="4"/>
+            <rect x="210" y="30" width="22" height="22" rx="4"/>
+            <rect x="240" y="30" width="22" height="22" rx="4"/>
+            <rect x="270" y="30" width="22" height="22" rx="4"/>
+            <rect x="300" y="30" width="22" height="22" rx="4"/>
+        </g>
+        <rect x="90" y="0" width="22" height="22" rx="4" fill="#3fb950"/>
+        <rect x="180" y="30" width="22" height="22" rx="4" fill="#58a6ff"/>
+        <rect x="270" y="0" width="22" height="22" rx="4" fill="#ff7b72"/>
     </g>
-    <rect x="90" y="0" width="22" height="22" rx="4" fill="#3fb950"/>
-    <rect x="180" y="30" width="22" height="22" rx="4" fill="#58a6ff"/>
-    <rect x="270" y="0" width="22" height="22" rx="4" fill="#ff7b72"/>
-  </g>
-  <rect x="48" y="214" width="104" height="34" rx="7" fill="#238636"/>
-  <path d="M83 222v18l20-9z" fill="#ffffff"/>
+    <rect x="48" y="214" width="104" height="34" rx="7" fill="#238636"/>
+    <path d="M83 222v18l20-9z" fill="#ffffff"/>
 </svg>
