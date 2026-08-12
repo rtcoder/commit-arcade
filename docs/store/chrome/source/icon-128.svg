@@ -1,29 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-    <rect width="128" height="128" rx="24" fill="#0d1117"/>
-    <g fill="#21262d">
-        <rect x="22" y="24" width="14" height="14" rx="3"/>
-        <rect x="40" y="24" width="14" height="14" rx="3"/>
-        <rect x="58" y="24" width="14" height="14" rx="3"/>
-        <rect x="76" y="24" width="14" height="14" rx="3"/>
-        <rect x="94" y="24" width="14" height="14" rx="3"/>
-        <rect x="22" y="42" width="14" height="14" rx="3"/>
-        <rect x="40" y="42" width="14" height="14" rx="3"/>
-        <rect x="58" y="42" width="14" height="14" rx="3"/>
-        <rect x="76" y="42" width="14" height="14" rx="3"/>
-        <rect x="94" y="42" width="14" height="14" rx="3"/>
-        <rect x="22" y="60" width="14" height="14" rx="3"/>
-        <rect x="40" y="60" width="14" height="14" rx="3"/>
-        <rect x="58" y="60" width="14" height="14" rx="3"/>
-        <rect x="76" y="60" width="14" height="14" rx="3"/>
-        <rect x="94" y="60" width="14" height="14" rx="3"/>
-        <rect x="22" y="78" width="14" height="14" rx="3"/>
-        <rect x="40" y="78" width="14" height="14" rx="3"/>
-        <rect x="58" y="78" width="14" height="14" rx="3"/>
-        <rect x="76" y="78" width="14" height="14" rx="3"/>
-        <rect x="94" y="78" width="14" height="14" rx="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+    <title id="title">Commit Arcade Chrome Web Store icon</title>
+    <desc id="desc">A small arcade cabinet with a contribution grid screen and colorful arcade controls.</desc>
+    <rect width="128" height="128" rx="26" fill="#0d1117"/>
+    <rect x="17" y="17" width="94" height="94" rx="16" fill="#161b22" stroke="#30363d" stroke-width="4"/>
+    <path d="M29 27h70l-6 58H35L29 27z" fill="#21262d" stroke="#f0f6fc" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="39" y="37" width="50" height="34" rx="5" fill="#0d1117" stroke="#30363d" stroke-width="3"/>
+    <g fill="#30363d">
+        <rect x="45" y="43" width="6" height="6" rx="1"/>
+        <rect x="54" y="43" width="6" height="6" rx="1"/>
+        <rect x="63" y="43" width="6" height="6" rx="1"/>
+        <rect x="72" y="43" width="6" height="6" rx="1"/>
+        <rect x="45" y="52" width="6" height="6" rx="1"/>
+        <rect x="54" y="52" width="6" height="6" rx="1"/>
+        <rect x="63" y="52" width="6" height="6" rx="1"/>
+        <rect x="72" y="52" width="6" height="6" rx="1"/>
+        <rect x="45" y="61" width="6" height="6" rx="1"/>
+        <rect x="54" y="61" width="6" height="6" rx="1"/>
+        <rect x="63" y="61" width="6" height="6" rx="1"/>
+        <rect x="72" y="61" width="6" height="6" rx="1"/>
     </g>
-    <rect x="58" y="42" width="14" height="14" rx="3" fill="#3fb950"/>
-    <rect x="76" y="60" width="14" height="14" rx="3" fill="#58a6ff"/>
-    <rect x="40" y="78" width="14" height="14" rx="3" fill="#ff7b72"/>
-    <path d="M48 102h12l20-12v-8L60 70H48v32z" fill="#f0f6fc"/>
+    <rect x="54" y="43" width="6" height="6" rx="1" fill="#3fb950"/>
+    <rect x="63" y="52" width="6" height="6" rx="1" fill="#58a6ff"/>
+    <rect x="72" y="61" width="6" height="6" rx="1" fill="#ff7b72"/>
+    <path d="M52 54 52 44 61 49z" fill="#f0f6fc"/>
+    <path d="M35 85h58l7 18H28l7-18z" fill="#f0f6fc"/>
+    <rect x="38" y="90" width="18" height="5" rx="2.5" fill="#0d1117"/>
+    <circle cx="69" cy="92" r="5" fill="#58a6ff"/>
+    <circle cx="84" cy="92" r="5" fill="#ff7b72"/>
+    <rect x="60" y="99" width="8" height="4" rx="2" fill="#3fb950"/>
 </svg>
