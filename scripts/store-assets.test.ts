@@ -96,7 +96,7 @@ describe('theme and responsive QA assets', () => {
     const css = await readText('extension/shared/styles/content.css');
 
     expect(css).toMatch(
-      /commit-arcade-game-active[\s\S]*ContributionCalendar-day[\s\S]*fill: var\(--commit-arcade-empty\) !important;[\s\S]*background-color: var\(--commit-arcade-empty\) !important;/,
+      /commit-arcade-game-active[\s\S]*ContributionCalendar-day[\s\S]*fill: var\(--contribution-default-bgColor-0\) !important;[\s\S]*background-color: var\(--contribution-default-bgColor-0\) !important;/,
     );
     expect(css).toMatch(
       /data-commit-arcade-state='player'][\s\S]*fill: var\(--commit-arcade-player\) !important;[\s\S]*background-color: var\(--commit-arcade-player\) !important;/,

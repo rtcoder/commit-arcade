@@ -142,8 +142,8 @@
 .commit-arcade-game-active rect[data-date],
 .commit-arcade-game-active [data-date][data-level],
 .commit-arcade-game-active [data-date][data-count] {
-  fill: var(--commit-arcade-empty) !important;
-  background-color: var(--commit-arcade-empty) !important;
+  fill: var(--contribution-default-bgColor-0) !important;
+  background-color: var(--contribution-default-bgColor-0) !important;
 }
 
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='player'],
