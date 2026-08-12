@@ -49,6 +49,18 @@ describe('createSnakeGame', () => {
     expect(cellAt(renderer.lastFrame, 0, 0)).toBe('bonus');
   });
 
+  it('spawns food at a random unoccupied coordinate instead of the first free cell', () => {
+    const game = createSnakeGame({ random: () => 0.75 });
+    const renderer = createTestRenderer();
+
+    game.start({ size: { rows: 3, columns: 5 } });
+    game.render(renderer);
+
+    expect(cellAt(renderer.lastFrame, 0, 0)).toBe('empty');
+    expect(cellAt(renderer.lastFrame, 2, 1)).toBe('bonus');
+    expect(cellAt(renderer.lastFrame, 1, 2)).toBe('player');
+  });
+
   it('ends when the snake collides with itself', () => {
     let gameOver = false;
     const game = createSnakeGame({

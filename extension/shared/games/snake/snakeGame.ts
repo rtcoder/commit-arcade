@@ -6,6 +6,7 @@ interface SnakeOptions {
   initialDirection?: BoardCoordinate;
   initialFood?: BoardCoordinate;
   initialSnake?: BoardCoordinate[];
+  random?: () => number;
 }
 
 const STEP_MS = 220;
@@ -101,12 +102,18 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
         return { ...candidate };
       }
     }
+    const availableCoordinates: BoardCoordinate[] = [];
     for (let row = 0; row < size.rows; row += 1) {
       for (let column = 0; column < size.columns; column += 1) {
         if (!isOnSnake({ row, column })) {
-          return { row, column };
+          availableCoordinates.push({ row, column });
         }
       }
+    }
+    if (availableCoordinates.length > 0) {
+      const random = options.random ?? Math.random;
+      const index = Math.min(Math.floor(random() * availableCoordinates.length), availableCoordinates.length - 1);
+      return { ...availableCoordinates[index]! };
     }
     return { row: 0, column: 0 };
   }
