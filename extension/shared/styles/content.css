@@ -37,8 +37,7 @@
     margin-top: 6px;
     max-width: min(220px, calc(100vw - 32px));
     padding: 6px;
-    position: absolute;
-    z-index: 20;
+    position: static;
 }
 
 .commit-arcade-picker-item {
@@ -122,11 +121,56 @@
     outline-offset: 2px;
 }
 
-@media (max-width: 480px) {
-    .commit-arcade-picker {
-        position: static;
-    }
+.commit-arcade-board {
+    display: grid;
+    gap: 2px;
+    grid-template-columns: repeat(var(--commit-arcade-board-columns), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--commit-arcade-board-rows), minmax(0, 1fr));
+    margin: 8px 0;
+    max-width: 100%;
+    position: relative;
+}
 
+.commit-arcade-board-cell {
+    aspect-ratio: 1;
+    background-color: var(--contribution-default-bgColor-0, var(--commit-arcade-empty));
+    border-radius: 2px;
+    min-width: 0;
+}
+
+.commit-arcade-board-menu.commit-arcade-picker {
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    box-shadow: none;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+.commit-arcade-menu-detail {
+    align-items: baseline;
+    color: var(--color-fg-default, #24292f);
+    display: flex;
+    flex-wrap: wrap;
+    font: inherit;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.commit-arcade-menu-detail-title {
+    font-weight: 600;
+}
+
+.commit-arcade-menu-detail-description {
+    color: var(--commit-arcade-dim);
+}
+
+@media (max-width: 480px) {
     .commit-arcade-session {
         align-items: stretch;
         display: grid;
@@ -144,6 +188,13 @@
 .commit-arcade-game-active [data-date][data-count] {
     fill: var(--contribution-default-bgColor-0) !important;
     background-color: var(--contribution-default-bgColor-0) !important;
+}
+
+.commit-arcade-game-active svg:has(.ContributionCalendar-day),
+.commit-arcade-game-active table:has(.ContributionCalendar-day),
+.commit-arcade-game-active table:has([data-date][data-level]),
+.commit-arcade-game-active table:has([data-date][data-count]) {
+    display: none !important;
 }
 
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='player'],

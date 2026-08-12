@@ -1,10 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 96" role="img" aria-labelledby="title desc">
     <title id="title">Commit Arcade logo</title>
     <desc id="desc">A terminal prompt mark followed by a pixel-style play symbol.</desc>
-    <g fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="10">
+    <g fill="none" stroke="#3fb950" stroke-linecap="square" stroke-linejoin="miter" stroke-width="10">
         <path d="M24 28 72 48 24 68"/>
         <path d="M96 68h48"/>
-        <path d="M176 24v48l56-24z" fill="currentColor" stroke="none"/>
-        <path d="M176 24h56v48h-56z"/>
+        <path d="M176 24v48l56-24z" fill="#3fb950" stroke="none"/>
     </g>
 </svg>

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Commit Arcade",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Play your GitHub contributions.",
   "icons": {
     "16": "assets/icons/icon-16.svg",

@@ -109,6 +109,16 @@ p {
     max-width: 62ch;
 }
 
+.release-note {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 4px;
+    max-width: 62ch;
+    padding: 8px 10px;
+}
+
 .actions {
     display: flex;
     flex-wrap: wrap;

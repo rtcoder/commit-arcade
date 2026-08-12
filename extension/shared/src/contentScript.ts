@@ -1,9 +1,11 @@
+import {type ArcadeBoard, createArcadeBoard} from '../core/arcadeBoard';
 import {createBoardRenderer} from '../core/boardRenderer';
 import {createGameEngine, type GameEngine} from '../core/gameEngine';
 import {gameRegistry} from '../core/gameRegistry';
-import type {CommitArcadeGame, GameMetadata} from '../core/gameTypes';
+import type {BoardRenderer, CommitArcadeGame, GameMetadata} from '../core/gameTypes';
 import {findContributionGraph} from '../core/githubContributionGraph';
 import {createInputManager} from '../core/inputManager';
+import {PIXEL_MENU_ITEM_STEP_ROWS, createPixelMenuFrame} from '../core/pixelText';
 import {
   type CommitArcadeSettings,
   type CommitArcadeSettingsStorage,
@@ -11,18 +13,23 @@ import {
   saveSettings,
 } from '../core/settings';
 import {type GraphSnapshot, restoreSnapshot, snapshotCells} from '../core/stateSnapshot';
+import {createAsteroidsGame} from '../games/asteroids/asteroidsGame';
 import {createBreakoutGame} from '../games/breakout/breakoutGame';
 import {createFlappyGame} from '../games/flappy/flappyGame';
 import {createFroggerGame} from '../games/frogger/froggerGame';
 import {createHelicopterGame} from '../games/helicopter/helicopterGame';
+import {createCentipedeGame} from '../games/centipede/centipedeGame';
+import {createMissileCommandGame} from '../games/missileCommand/missileCommandGame';
 import {createPongGame} from '../games/pong/pongGame';
 import {createRhythmGame} from '../games/rhythm/rhythmGame';
 import {createRunnerGame} from '../games/runner/runnerGame';
 import {createSnakeGame} from '../games/snake/snakeGame';
 import {createSpaceInvadersGame} from '../games/spaceInvaders/spaceInvadersGame';
+import {createTetrisGame} from '../games/tetris/tetrisGame';
 import {createTronGame} from '../games/tron/tronGame';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
+const MENU_SCROLL_DURATION_MS = 160;
 
 export interface CommitArcadeController {
   destroy(): void;
@@ -54,7 +61,14 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeGame: GameMetadata | null = null;
   let activeScore = 0;
   let activeStatus = 'Ready';
+  let activeArcadeBoard: ArcadeBoard | null = null;
   let activeSession: HTMLElement | null = null;
+  let activeMenu: HTMLElement | null = null;
+  let activeMenuGames: readonly GameMetadata[] = [];
+  let activeMenuRenderer: BoardRenderer | null = null;
+  let activeMenuSelection = 0;
+  let activeMenuDetail: HTMLElement | null = null;
+  let activeMenuAnimationFrame = 0;
   const highScores: Record<string, number> = {};
   let selectedGame = 'runner';
   let settingsLoaded = options.storage === undefined;
@@ -98,19 +112,23 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         stopGame(button);
         return;
       }
+      if (activeMenu !== null) {
+        closeGameMenu(button);
+        return;
+      }
       if (!settingsLoaded) {
         void settingsPromise.finally(() => {
           if (activeEngine === null && activeSession === null && graph.container.querySelector('.commit-arcade-picker') === null) {
-            togglePicker(root, graph.container, button, ownedElements, startGame, selectedGame);
+            openGameMenu(button);
           }
         });
         return;
       }
-      togglePicker(root, graph.container, button, ownedElements, startGame, selectedGame);
+      openGameMenu(button);
     }, {
       signal: abortController.signal,
     });
-    graph.container.insertAdjacentElement('afterbegin', button);
+    graph.container.append(button);
     ownedElements.push(button);
     root.addEventListener(
       'visibilitychange',
@@ -141,13 +159,20 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     if (playableGame === null) {
       return;
     }
-    graph.container.querySelector('.commit-arcade-picker')?.remove();
+    activeMenu?.remove();
+    activeMenu = null;
+    activeMenuGames = [];
+    activeMenuRenderer = null;
+    activeMenuDetail?.remove();
+    activeMenuDetail = null;
+    cancelMenuAnimation();
+    inputManager.deactivate();
     activeGame = playableGame;
     activeScore = 0;
     activeStatus = 'Playing';
     selectedGame = game.id;
     persistSettings({selectedGame});
-    activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
+    activeSnapshot ??= snapshotCells(graph.cells.map((cell) => cell.element));
     graph.container.classList.add(ACTIVE_GRAPH_CLASS);
     activeSession = showSession(root, graph.container, ownedElements, {
       game: playableGame,
@@ -157,10 +182,12 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       score: activeScore,
       status: activeStatus,
     });
-    const renderer = createBoardRenderer(graph);
+    const board = ensureArcadeBoard(graph, button);
+    board.element.setAttribute('aria-hidden', 'true');
+    const renderer = createBoardRenderer(board.graph);
     activeEngine = createGameEngine({
       renderer,
-      size: graph.size,
+      size: board.graph.size,
       onError: () => {
         stopGame(button);
         showMessage(root, graph.container, ownedElements, 'Game over. Commit Arcade restored the graph.');
@@ -204,10 +231,19 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeEngine?.stop();
     activeEngine = null;
     activeButton = null;
+    activeMenu?.remove();
+    activeMenu = null;
+    activeMenuGames = [];
+    activeMenuRenderer = null;
+    activeMenuDetail?.remove();
+    activeMenuDetail = null;
+    cancelMenuAnimation();
     if (activeSnapshot !== null) {
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
     }
+    activeArcadeBoard?.destroy();
+    activeArcadeBoard = null;
     activeGraph?.container.classList.remove(ACTIVE_GRAPH_CLASS);
     root.querySelector('.commit-arcade-picker')?.remove();
     activeSession?.remove();
@@ -219,6 +255,125 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       button.textContent = '▶ Play';
       button.setAttribute('aria-label', 'Play Commit Arcade');
     }
+  }
+
+  function openGameMenu(button: HTMLButtonElement): void {
+    if (activeGraph === null) {
+      return;
+    }
+    const graph = activeGraph;
+    activeSnapshot ??= snapshotCells(graph.cells.map((cell) => cell.element));
+    graph.container.classList.add(ACTIVE_GRAPH_CLASS);
+    const board = ensureArcadeBoard(graph, button);
+    board.element.removeAttribute('aria-hidden');
+    activeMenuGames = orderedGames(selectedGame);
+    activeMenuSelection = 0;
+    activeMenuRenderer = createBoardRenderer(board.graph);
+    activeMenu = showBoardGameMenu(root, board.element, activeMenuGames, activeMenuSelection, {
+      onChoose: (game) => startGame(game, button),
+      onHover: (index) => {
+        activeMenuSelection = index;
+        renderMenuSelection();
+      },
+    });
+    activeMenuDetail = showMenuDetail(root, button, activeMenuGames[activeMenuSelection]);
+    renderMenuSelection();
+    inputManager.activate(new Set(['ArrowUp', 'ArrowDown', 'Enter', 'Escape']), (input) => {
+      if (input.type !== 'down' || activeMenu === null) {
+        return;
+      }
+      if (input.key === 'Escape') {
+        closeGameMenu(button);
+        return;
+      }
+      if (input.key === 'Enter') {
+        const game = activeMenuGames[activeMenuSelection];
+        if (game !== undefined) {
+          startGame(game, button);
+        }
+        return;
+      }
+      const direction = input.key === 'ArrowUp' ? -1 : 1;
+      activeMenuSelection = wrapMenuSelection(activeMenuSelection + direction, activeMenuGames.length);
+      animateMenuSelection(direction);
+    });
+    button.textContent = '× Close';
+    button.setAttribute('aria-label', 'Close Commit Arcade menu');
+    activeButton = button;
+  }
+
+  function closeGameMenu(button: HTMLButtonElement | null): void {
+    inputManager.deactivate();
+    activeMenu?.remove();
+    activeMenu = null;
+    activeMenuGames = [];
+    activeMenuRenderer = null;
+    activeMenuDetail?.remove();
+    activeMenuDetail = null;
+    cancelMenuAnimation();
+    if (activeSnapshot !== null) {
+      restoreSnapshot(activeSnapshot);
+      activeSnapshot = null;
+    }
+    activeArcadeBoard?.destroy();
+    activeArcadeBoard = null;
+    activeGraph?.container.classList.remove(ACTIVE_GRAPH_CLASS);
+    activeButton = null;
+    if (button !== null) {
+      button.textContent = '▶ Play';
+      button.setAttribute('aria-label', 'Play Commit Arcade');
+    }
+  }
+
+  function ensureArcadeBoard(graph: NonNullable<typeof activeGraph>, button: HTMLButtonElement): ArcadeBoard {
+    if (activeArcadeBoard === null) {
+      activeArcadeBoard = createArcadeBoard(root, graph);
+      button.insertAdjacentElement('beforebegin', activeArcadeBoard.element);
+    }
+    return activeArcadeBoard;
+  }
+
+  function renderMenuSelection(scrollOffsetRows = 0): void {
+    if (activeMenu === null) {
+      return;
+    }
+    updateBoardGameMenuSelection(activeMenu, activeMenuSelection);
+    activeMenuRenderer?.render(createPixelMenuFrame({
+      labels: activeMenuGames.map((game) => menuLabelForGame(game.id)),
+      scrollOffsetRows,
+      selectedIndex: activeMenuSelection,
+      size: activeArcadeBoard?.graph.size ?? {columns: 1, rows: 1},
+    }));
+    renderMenuDetail(activeMenuDetail, activeMenuGames[activeMenuSelection]);
+  }
+
+  function animateMenuSelection(direction: number): void {
+    cancelMenuAnimation();
+    const initialOffset = direction * PIXEL_MENU_ITEM_STEP_ROWS;
+    const startedAt = view.performance.now();
+    renderMenuSelection(initialOffset);
+
+    const step = (now: number): void => {
+      const progress = Math.min(1, Math.max(0, (now - startedAt) / MENU_SCROLL_DURATION_MS));
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const offset = Math.round(initialOffset * (1 - eased));
+      renderMenuSelection(offset);
+      if (progress < 1) {
+        activeMenuAnimationFrame = view.requestAnimationFrame(step);
+        return;
+      }
+      activeMenuAnimationFrame = 0;
+    };
+
+    activeMenuAnimationFrame = view.requestAnimationFrame(step);
+  }
+
+  function cancelMenuAnimation(): void {
+    if (activeMenuAnimationFrame === 0) {
+      return;
+    }
+    view.cancelAnimationFrame(activeMenuAnimationFrame);
+    activeMenuAnimationFrame = 0;
   }
 
   function restartGame(button: HTMLButtonElement): void {
@@ -267,54 +422,79 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   }
 }
 
-function togglePicker(
-  root: Document,
-  container: Element,
-  button: HTMLButtonElement,
-  ownedElements: Element[],
-  startGame: (game: GameMetadata, button: HTMLButtonElement) => void,
-  selectedGame: string,
-): void {
-  const existingPicker = container.querySelector('.commit-arcade-picker');
-  if (existingPicker !== null) {
-    existingPicker.remove();
-    button.textContent = '▶ Play';
-    button.setAttribute('aria-label', 'Play Commit Arcade');
-    return;
-  }
+interface BoardGameMenuHandlers {
+  onChoose: (game: GameMetadata) => void;
+  onHover: (index: number) => void;
+}
 
+function showBoardGameMenu(
+  root: Document,
+  board: HTMLElement,
+  games: readonly GameMetadata[],
+  selectedIndex: number,
+  handlers: BoardGameMenuHandlers,
+): HTMLElement {
+  board.querySelector('.commit-arcade-picker')?.remove();
   const picker = root.createElement('div');
-  picker.className = 'commit-arcade-picker';
+  picker.className = 'commit-arcade-picker commit-arcade-board-menu';
   picker.setAttribute('role', 'menu');
   picker.setAttribute('aria-label', 'Choose a game');
 
-  for (const game of orderedGames(selectedGame)) {
+  games.forEach((game, index) => {
     const item = root.createElement('button');
     item.type = 'button';
-    item.className = 'commit-arcade-picker-item';
+    item.className = 'commit-arcade-picker-item commit-arcade-board-menu-item';
     item.textContent = game.name;
     item.setAttribute('role', 'menuitem');
     item.setAttribute('aria-label', game.status === 'playable' ? `Start ${game.name}. ${game.description}` : `${game.name}. Planned game.`);
-    if (game.id === selectedGame) {
-      item.setAttribute('aria-current', 'true');
-    }
+    item.dataset.commitArcadeMenuIndex = String(index);
     if (game.status === 'planned') {
       item.disabled = true;
       item.setAttribute('aria-disabled', 'true');
     } else {
-      item.addEventListener('click', () => startGame(game, button));
+      item.addEventListener('click', () => handlers.onChoose(game));
       item.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          startGame(game, button);
+          handlers.onChoose(game);
         }
       });
+      item.addEventListener('pointerenter', () => handlers.onHover(index));
+      item.addEventListener('focus', () => handlers.onHover(index));
     }
     picker.append(item);
-  }
+  });
 
-  button.insertAdjacentElement('afterend', picker);
-  ownedElements.push(picker);
+  board.append(picker);
+  updateBoardGameMenuSelection(picker, selectedIndex);
+  return picker;
+}
+
+function showMenuDetail(root: Document, button: HTMLButtonElement, game: GameMetadata | undefined): HTMLElement {
+  button.parentElement?.querySelector('.commit-arcade-menu-detail')?.remove();
+  const detail = root.createElement('div');
+  detail.className = 'commit-arcade-menu-detail';
+  detail.setAttribute('role', 'status');
+  renderMenuDetail(detail, game);
+  button.insertAdjacentElement('afterend', detail);
+  return detail;
+}
+
+function renderMenuDetail(detail: HTMLElement | null, game: GameMetadata | undefined): void {
+  if (detail === null || game === undefined) {
+    return;
+  }
+  detail.replaceChildren();
+
+  const title = detail.ownerDocument.createElement('span');
+  title.className = 'commit-arcade-menu-detail-title';
+  title.textContent = game.name;
+
+  const description = detail.ownerDocument.createElement('span');
+  description.className = 'commit-arcade-menu-detail-description';
+  description.textContent = game.description;
+
+  detail.append(title, description);
 }
 
 function orderedGames(selectedGame: string): readonly GameMetadata[] {
@@ -323,6 +503,60 @@ function orderedGames(selectedGame: string): readonly GameMetadata[] {
     return gameRegistry;
   }
   return [selected, ...gameRegistry.filter((game) => game.id !== selectedGame)];
+}
+
+function updateBoardGameMenuSelection(menu: HTMLElement, selectedIndex: number): void {
+  for (const item of Array.from(menu.querySelectorAll<HTMLElement>('.commit-arcade-board-menu-item'))) {
+    const isSelected = Number(item.dataset.commitArcadeMenuIndex) === selectedIndex;
+    item.setAttribute('aria-current', isSelected ? 'true' : 'false');
+    item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    item.tabIndex = isSelected ? 0 : -1;
+    if (isSelected && item.ownerDocument.activeElement !== item) {
+      item.focus({preventScroll: true});
+    }
+  }
+}
+
+function wrapMenuSelection(index: number, length: number): number {
+  if (length <= 0) {
+    return 0;
+  }
+  return (index + length) % length;
+}
+
+function menuLabelForGame(gameId: string): string {
+  switch (gameId) {
+    case 'runner':
+      return 'RUNNER';
+    case 'snake':
+      return 'SNAKE';
+    case 'flappy':
+      return 'FLAPPY';
+    case 'pong':
+      return 'PONG';
+    case 'breakout':
+      return 'BREAK';
+    case 'space-invaders':
+      return 'INVADER';
+    case 'tron':
+      return 'TRON';
+    case 'frogger':
+      return 'FROG';
+    case 'helicopter':
+      return 'HELI';
+    case 'rhythm':
+      return 'BEAT';
+    case 'missile-command':
+      return 'MISSILE';
+    case 'centipede':
+      return 'CENTI';
+    case 'tetris':
+      return 'TETRIS';
+    case 'asteroids':
+      return 'ROIDS';
+    default:
+      return gameId.toUpperCase().slice(0, 7);
+  }
 }
 
 function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['gameFactories'] = {}): CommitArcadeGame | null {
@@ -352,6 +586,14 @@ function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['game
       return createHelicopterGame();
     case 'rhythm':
       return createRhythmGame();
+    case 'missile-command':
+      return createMissileCommandGame();
+    case 'centipede':
+      return createCentipedeGame();
+    case 'tetris':
+      return createTetrisGame();
+    case 'asteroids':
+      return createAsteroidsGame();
     default:
       return null;
   }
@@ -363,7 +605,7 @@ function showMessage(root: Document, container: Element, ownedElements: Element[
   message.className = 'commit-arcade-message';
   message.setAttribute('role', 'status');
   message.textContent = text;
-  container.insertAdjacentElement('afterbegin', message);
+  container.append(message);
   ownedElements.push(message);
 }
 
@@ -382,7 +624,7 @@ function showSession(root: Document, container: Element, ownedElements: Element[
   session.className = 'commit-arcade-session';
   session.setAttribute('role', 'status');
   renderSessionContent(session, model);
-  container.insertAdjacentElement('afterbegin', session);
+  container.append(session);
   ownedElements.push(session);
   return session;
 }
@@ -446,6 +688,13 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
       return new Set(['ArrowUp', ' ', 'Space', 'Escape']);
     case 'rhythm':
       return new Set(['ArrowLeft', 'ArrowDown', 'ArrowUp', 'ArrowRight', 'a', 's', 'd', 'f', 'A', 'S', 'D', 'F', 'Escape']);
+    case 'missile-command':
+    case 'centipede':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
+    case 'tetris':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'a', 'd', 's', 'A', 'D', 'S', 'Escape']);
+    case 'asteroids':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
     default:
       return new Set(['Escape']);
   }
@@ -473,6 +722,14 @@ function controlsHelpForGame(gameId: string): string {
       return 'Hold Up or Space to rise. Esc stops.';
     case 'rhythm':
       return 'Hit lanes with A/S/D/F or arrows. Esc stops.';
+    case 'missile-command':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
+    case 'centipede':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
+    case 'tetris':
+      return 'Move with Left/Right, drop with Down. Esc stops.';
+    case 'asteroids':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
     default:
       return 'Esc stops.';
   }

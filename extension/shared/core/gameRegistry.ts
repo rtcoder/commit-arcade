@@ -61,4 +61,28 @@ export const gameRegistry: readonly GameMetadata[] = [
     description: 'A minimal lane rhythm game for commit timelines.',
     status: 'playable',
   },
+  {
+    id: 'missile-command',
+    name: 'Missile Command',
+    description: 'Defend the contribution base from falling missiles.',
+    status: 'playable',
+  },
+  {
+    id: 'centipede',
+    name: 'Centipede',
+    description: 'Shoot a descending segmented bug before it reaches your row.',
+    status: 'playable',
+  },
+  {
+    id: 'tetris',
+    name: 'Mini Tetris',
+    description: 'Compact falling blocks on the contribution grid.',
+    status: 'playable',
+  },
+  {
+    id: 'asteroids',
+    name: 'Asteroids',
+    description: 'Dodge and shoot drifting asteroids on the contribution grid.',
+    status: 'playable',
+  },
 ];

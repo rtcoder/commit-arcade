@@ -66,6 +66,10 @@ describe('v1 public website content', () => {
     expect(games).toContain('Tron');
     expect(games).toContain('Helicopter');
     expect(games).toContain('Commit Beat');
+    expect(games).toContain('Missile Command');
+    expect(games).toContain('Centipede');
+    expect(games).toContain('Mini Tetris');
+    expect(games).toContain('Asteroids');
     expect(games).toContain('Arrow keys');
     expect(games).toContain('Space');
     expect(games).toContain('Escape');
@@ -89,6 +93,8 @@ describe('theme and responsive QA assets', () => {
 
     expect(css).toContain('.commit-arcade-picker-item:focus-visible');
     expect(css).toContain('.commit-arcade-session-button:focus-visible');
+    expect(css).toContain('.commit-arcade-board');
+    expect(css).toContain('.commit-arcade-board-cell');
     expect(css).toContain('@media (max-width: 480px)');
     expect(css).toContain('max-width: min(220px, calc(100vw - 32px))');
     expect(qa).toContain('GitHub light theme');

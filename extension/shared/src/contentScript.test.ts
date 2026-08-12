@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import type {CommitArcadeSettingsStorage} from '../core/settings';
 
 import {initializeCommitArcade} from './contentScript';
@@ -72,6 +72,107 @@ describe('initializeCommitArcade', () => {
     expect(document.querySelector('.commit-arcade-button')).toBeNull();
   });
 
+  it('replaces the graph area with the arcade board and keeps controls below it', () => {
+    document.body.innerHTML = contributionGraphFixture();
+
+    const controller = initializeCommitArcade(document);
+    const svg = document.querySelector('svg');
+    const playButton = document.querySelector<HTMLButtonElement>('.commit-arcade-button');
+
+    expect(playButton?.previousElementSibling).toBe(svg);
+
+    playButton?.click();
+
+    const picker = document.querySelector('.commit-arcade-picker');
+    const menuBoard = document.querySelector('.commit-arcade-board');
+
+    expect(menuBoard?.previousElementSibling).toBe(svg);
+    expect(picker?.parentElement).toBe(menuBoard);
+    expect(playButton?.previousElementSibling).toBe(menuBoard);
+    expect(document.querySelectorAll('.commit-arcade-board-cell[data-commit-arcade-state]')).not.toHaveLength(0);
+    expect(document.querySelector<HTMLElement>('.commit-arcade-menu-detail')?.textContent).toContain('Commit Runner');
+
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    const session = document.querySelector('.commit-arcade-session');
+    const board = document.querySelector('.commit-arcade-board');
+
+    expect(board?.previousElementSibling).toBe(svg);
+    expect(playButton?.previousElementSibling).toBe(board);
+    expect(session?.previousElementSibling).toBe(playButton);
+
+    controller.destroy();
+  });
+
+  it('loops board menu selection with arrows, starts with Enter, and closes with Escape', () => {
+    document.body.innerHTML = contributionGraphFixture();
+
+    const controller = initializeCommitArcade(document);
+    const playButton = document.querySelector<HTMLButtonElement>('.commit-arcade-button');
+
+    playButton?.click();
+
+    const pickerItems = document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item');
+
+    expect(document.querySelector('.commit-arcade-picker')?.parentElement).toBe(document.querySelector('.commit-arcade-board'));
+    expect(pickerItems[0]?.getAttribute('aria-selected')).toBe('true');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'ArrowUp'}));
+
+    expect(pickerItems[pickerItems.length - 1]?.getAttribute('aria-selected')).toBe('true');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'ArrowDown'}));
+
+    expect(pickerItems[0]?.getAttribute('aria-selected')).toBe('true');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Enter'}));
+
+    expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Commit Runner');
+
+    document.querySelector<HTMLButtonElement>('.commit-arcade-stop-button')?.click();
+    playButton?.click();
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Escape'}));
+
+    expect(document.querySelector('.commit-arcade-picker')).toBeNull();
+    expect(document.querySelector('.commit-arcade-board')).toBeNull();
+    expect(playButton?.textContent).toContain('Play');
+
+    controller.destroy();
+  });
+
+  it('renders an intermediate scroll frame when changing the board menu selection', () => {
+    document.body.innerHTML = contributionGraphFixture();
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    const originalCancelAnimationFrame = window.cancelAnimationFrame;
+    const frameCallbacks: FrameRequestCallback[] = [];
+    window.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    });
+    window.cancelAnimationFrame = vi.fn();
+
+    const controller = initializeCommitArcade(document);
+
+    try {
+      document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+      window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'ArrowDown'}));
+
+      expect(menuRowsContaining('player').every((row) => row >= 11)).toBe(true);
+
+      frameCallbacks.at(-1)?.(window.performance.now() + 200);
+
+      const settledRows = menuRowsContaining('player');
+
+      expect(Math.min(...settledRows)).toBe(6);
+      expect(Math.max(...settledRows)).toBe(15);
+
+    } finally {
+      controller.destroy();
+      window.requestAnimationFrame = originalRequestAnimationFrame;
+      window.cancelAnimationFrame = originalCancelAnimationFrame;
+    }
+  });
+
   it('starts a playable game in the contribution cells and restores the graph on Stop', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">
@@ -88,10 +189,17 @@ describe('initializeCommitArcade', () => {
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
     document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
 
+    const arcadeBoard = document.querySelector<HTMLElement>('.commit-arcade-board');
+
+    expect(arcadeBoard).not.toBeNull();
+    expect(arcadeBoard?.style.getPropertyValue('--commit-arcade-board-rows')).toBe('21');
+    expect(arcadeBoard?.style.getPropertyValue('--commit-arcade-board-columns')).toBe('2');
+    expect(document.querySelectorAll('.commit-arcade-board-cell')).toHaveLength(42);
     expect(document.querySelector('[data-commit-arcade-state="player"]')).not.toBeNull();
 
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
 
+    expect(document.querySelector('.commit-arcade-board')).toBeNull();
     expect(document.querySelector('[data-commit-arcade-state]')).toBeNull();
     expect(document.querySelector('rect')?.getAttribute('fill')).toBe('#ebedf0');
 
@@ -250,10 +358,22 @@ describe('initializeCommitArcade', () => {
   });
 
   it('starts newly shipped games from playable picker entries', () => {
-    document.body.innerHTML = contributionGraphFixture();
+    document.body.innerHTML = wideContributionGraphFixture();
 
     const controller = initializeCommitArcade(document);
-    for (const gameName of ['Pong', 'Breakout', 'Space Invaders', 'Tron', 'Frogger', 'Helicopter', 'Commit Beat']) {
+    for (const gameName of [
+      'Pong',
+      'Breakout',
+      'Space Invaders',
+      'Tron',
+      'Frogger',
+      'Helicopter',
+      'Commit Beat',
+      'Missile Command',
+      'Centipede',
+      'Mini Tetris',
+      'Asteroids',
+    ]) {
       document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
       const item = Array.from(document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')).find((button) =>
         button.textContent?.includes(gameName),
@@ -541,6 +661,17 @@ function contributionGraphFixture(): string {
   `;
 }
 
+function wideContributionGraphFixture(): string {
+  const cells = Array.from({length: 12}, (_, column) =>
+    `<rect class="ContributionCalendar-day" data-date="2026-01-${String(column + 1).padStart(2, '0')}" data-level="0" x="${column * 12}" y="0" fill="#ebedf0"></rect>`,
+  ).join('');
+  return `
+    <section aria-label="Contribution Graph">
+      <svg>${cells}</svg>
+    </section>
+  `;
+}
+
 function createMemoryStorage(values: Record<string, unknown>): CommitArcadeSettingsStorage {
   return {
     async get(key) {
@@ -550,6 +681,15 @@ function createMemoryStorage(values: Record<string, unknown>): CommitArcadeSetti
       Object.assign(values, patch);
     },
   };
+}
+
+function menuRowsContaining(state: string): number[] {
+  const board = document.querySelector<HTMLElement>('.commit-arcade-board');
+  const columns = Number(board?.style.getPropertyValue('--commit-arcade-board-columns') ?? 1);
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('.commit-arcade-board-cell')).flatMap((cell, index) =>
+    cell.dataset.commitArcadeState === state ? [Math.floor(index / columns)] : [],
+  );
+  return [...new Set(rows)];
 }
 
 async function flushPromises(): Promise<void> {

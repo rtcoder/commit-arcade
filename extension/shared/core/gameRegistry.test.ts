@@ -7,7 +7,22 @@ describe('gameRegistry', () => {
     const playable = gameRegistry.filter((game) => game.status === 'playable').map((game) => game.id);
     const planned = gameRegistry.filter((game) => game.status === 'planned').map((game) => game.id);
 
-    expect(playable).toEqual(['runner', 'snake', 'flappy', 'pong', 'breakout', 'space-invaders', 'tron', 'frogger', 'helicopter', 'rhythm']);
+    expect(playable).toEqual([
+      'runner',
+      'snake',
+      'flappy',
+      'pong',
+      'breakout',
+      'space-invaders',
+      'tron',
+      'frogger',
+      'helicopter',
+      'rhythm',
+      'missile-command',
+      'centipede',
+      'tetris',
+      'asteroids',
+    ]);
     expect(planned).toEqual([]);
   });
 });
