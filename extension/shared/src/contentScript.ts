@@ -61,6 +61,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeStatus = 'Ready';
   let activeArcadeBoard: ArcadeBoard | null = null;
   let activeSession: HTMLElement | null = null;
+  let activeMenu: HTMLElement | null = null;
+  let activeMenuGames: readonly GameMetadata[] = [];
+  let activeMenuSelection = 0;
   const highScores: Record<string, number> = {};
   let selectedGame = 'runner';
   let settingsLoaded = options.storage === undefined;
@@ -104,15 +107,19 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         stopGame(button);
         return;
       }
+      if (activeMenu !== null) {
+        closeGameMenu(button);
+        return;
+      }
       if (!settingsLoaded) {
         void settingsPromise.finally(() => {
           if (activeEngine === null && activeSession === null && graph.container.querySelector('.commit-arcade-picker') === null) {
-            togglePicker(root, graph.container, button, ownedElements, startGame, selectedGame);
+            openGameMenu(button);
           }
         });
         return;
       }
-      togglePicker(root, graph.container, button, ownedElements, startGame, selectedGame);
+      openGameMenu(button);
     }, {
       signal: abortController.signal,
     });
@@ -147,13 +154,16 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     if (playableGame === null) {
       return;
     }
-    graph.container.querySelector('.commit-arcade-picker')?.remove();
+    activeMenu?.remove();
+    activeMenu = null;
+    activeMenuGames = [];
+    inputManager.deactivate();
     activeGame = playableGame;
     activeScore = 0;
     activeStatus = 'Playing';
     selectedGame = game.id;
     persistSettings({selectedGame});
-    activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
+    activeSnapshot ??= snapshotCells(graph.cells.map((cell) => cell.element));
     graph.container.classList.add(ACTIVE_GRAPH_CLASS);
     activeSession = showSession(root, graph.container, ownedElements, {
       game: playableGame,
@@ -163,12 +173,12 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       score: activeScore,
       status: activeStatus,
     });
-    activeArcadeBoard = createArcadeBoard(root, graph);
-    button.insertAdjacentElement('beforebegin', activeArcadeBoard.element);
-    const renderer = createBoardRenderer(activeArcadeBoard.graph);
+    const board = ensureArcadeBoard(graph, button);
+    board.element.setAttribute('aria-hidden', 'true');
+    const renderer = createBoardRenderer(board.graph);
     activeEngine = createGameEngine({
       renderer,
-      size: activeArcadeBoard.graph.size,
+      size: board.graph.size,
       onError: () => {
         stopGame(button);
         showMessage(root, graph.container, ownedElements, 'Game over. Commit Arcade restored the graph.');
@@ -212,6 +222,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeEngine?.stop();
     activeEngine = null;
     activeButton = null;
+    activeMenu?.remove();
+    activeMenu = null;
+    activeMenuGames = [];
     if (activeSnapshot !== null) {
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
@@ -229,6 +242,81 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       button.textContent = '▶ Play';
       button.setAttribute('aria-label', 'Play Commit Arcade');
     }
+  }
+
+  function openGameMenu(button: HTMLButtonElement): void {
+    if (activeGraph === null) {
+      return;
+    }
+    const graph = activeGraph;
+    activeSnapshot ??= snapshotCells(graph.cells.map((cell) => cell.element));
+    graph.container.classList.add(ACTIVE_GRAPH_CLASS);
+    const board = ensureArcadeBoard(graph, button);
+    board.element.removeAttribute('aria-hidden');
+    activeMenuGames = orderedGames(selectedGame);
+    activeMenuSelection = 0;
+    activeMenu = showBoardGameMenu(root, board.element, activeMenuGames, activeMenuSelection, {
+      onChoose: (game) => startGame(game, button),
+      onHover: (index) => {
+        activeMenuSelection = index;
+        renderMenuSelection();
+      },
+    });
+    inputManager.activate(new Set(['ArrowUp', 'ArrowDown', 'Enter', 'Escape']), (input) => {
+      if (input.type !== 'down' || activeMenu === null) {
+        return;
+      }
+      if (input.key === 'Escape') {
+        closeGameMenu(button);
+        return;
+      }
+      if (input.key === 'Enter') {
+        const game = activeMenuGames[activeMenuSelection];
+        if (game !== undefined) {
+          startGame(game, button);
+        }
+        return;
+      }
+      activeMenuSelection = wrapMenuSelection(input.key === 'ArrowUp' ? activeMenuSelection - 1 : activeMenuSelection + 1, activeMenuGames.length);
+      renderMenuSelection();
+    });
+    button.textContent = '× Close';
+    button.setAttribute('aria-label', 'Close Commit Arcade menu');
+    activeButton = button;
+  }
+
+  function closeGameMenu(button: HTMLButtonElement | null): void {
+    inputManager.deactivate();
+    activeMenu?.remove();
+    activeMenu = null;
+    activeMenuGames = [];
+    if (activeSnapshot !== null) {
+      restoreSnapshot(activeSnapshot);
+      activeSnapshot = null;
+    }
+    activeArcadeBoard?.destroy();
+    activeArcadeBoard = null;
+    activeGraph?.container.classList.remove(ACTIVE_GRAPH_CLASS);
+    activeButton = null;
+    if (button !== null) {
+      button.textContent = '▶ Play';
+      button.setAttribute('aria-label', 'Play Commit Arcade');
+    }
+  }
+
+  function ensureArcadeBoard(graph: NonNullable<typeof activeGraph>, button: HTMLButtonElement): ArcadeBoard {
+    if (activeArcadeBoard === null) {
+      activeArcadeBoard = createArcadeBoard(root, graph);
+      button.insertAdjacentElement('beforebegin', activeArcadeBoard.element);
+    }
+    return activeArcadeBoard;
+  }
+
+  function renderMenuSelection(): void {
+    if (activeMenu === null) {
+      return;
+    }
+    updateBoardGameMenuSelection(activeMenu, activeMenuSelection);
   }
 
   function restartGame(button: HTMLButtonElement): void {
@@ -277,54 +365,52 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   }
 }
 
-function togglePicker(
-  root: Document,
-  container: Element,
-  button: HTMLButtonElement,
-  ownedElements: Element[],
-  startGame: (game: GameMetadata, button: HTMLButtonElement) => void,
-  selectedGame: string,
-): void {
-  const existingPicker = container.querySelector('.commit-arcade-picker');
-  if (existingPicker !== null) {
-    existingPicker.remove();
-    button.textContent = '▶ Play';
-    button.setAttribute('aria-label', 'Play Commit Arcade');
-    return;
-  }
+interface BoardGameMenuHandlers {
+  onChoose: (game: GameMetadata) => void;
+  onHover: (index: number) => void;
+}
 
+function showBoardGameMenu(
+  root: Document,
+  board: HTMLElement,
+  games: readonly GameMetadata[],
+  selectedIndex: number,
+  handlers: BoardGameMenuHandlers,
+): HTMLElement {
+  board.querySelector('.commit-arcade-picker')?.remove();
   const picker = root.createElement('div');
-  picker.className = 'commit-arcade-picker';
+  picker.className = 'commit-arcade-picker commit-arcade-board-menu';
   picker.setAttribute('role', 'menu');
   picker.setAttribute('aria-label', 'Choose a game');
 
-  for (const game of orderedGames(selectedGame)) {
+  games.forEach((game, index) => {
     const item = root.createElement('button');
     item.type = 'button';
-    item.className = 'commit-arcade-picker-item';
+    item.className = 'commit-arcade-picker-item commit-arcade-board-menu-item';
     item.textContent = game.name;
     item.setAttribute('role', 'menuitem');
     item.setAttribute('aria-label', game.status === 'playable' ? `Start ${game.name}. ${game.description}` : `${game.name}. Planned game.`);
-    if (game.id === selectedGame) {
-      item.setAttribute('aria-current', 'true');
-    }
+    item.dataset.commitArcadeMenuIndex = String(index);
     if (game.status === 'planned') {
       item.disabled = true;
       item.setAttribute('aria-disabled', 'true');
     } else {
-      item.addEventListener('click', () => startGame(game, button));
+      item.addEventListener('click', () => handlers.onChoose(game));
       item.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          startGame(game, button);
+          handlers.onChoose(game);
         }
       });
+      item.addEventListener('pointerenter', () => handlers.onHover(index));
+      item.addEventListener('focus', () => handlers.onHover(index));
     }
     picker.append(item);
-  }
+  });
 
-  button.insertAdjacentElement('afterend', picker);
-  ownedElements.push(picker);
+  board.append(picker);
+  updateBoardGameMenuSelection(picker, selectedIndex);
+  return picker;
 }
 
 function orderedGames(selectedGame: string): readonly GameMetadata[] {
@@ -333,6 +419,25 @@ function orderedGames(selectedGame: string): readonly GameMetadata[] {
     return gameRegistry;
   }
   return [selected, ...gameRegistry.filter((game) => game.id !== selectedGame)];
+}
+
+function updateBoardGameMenuSelection(menu: HTMLElement, selectedIndex: number): void {
+  for (const item of Array.from(menu.querySelectorAll<HTMLElement>('.commit-arcade-board-menu-item'))) {
+    const isSelected = Number(item.dataset.commitArcadeMenuIndex) === selectedIndex;
+    item.setAttribute('aria-current', isSelected ? 'true' : 'false');
+    item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    item.tabIndex = isSelected ? 0 : -1;
+    if (isSelected && item.ownerDocument.activeElement !== item) {
+      item.focus({preventScroll: true});
+    }
+  }
+}
+
+function wrapMenuSelection(index: number, length: number): number {
+  if (length <= 0) {
+    return 0;
+  }
+  return (index + length) % length;
 }
 
 function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['gameFactories'] = {}): CommitArcadeGame | null {

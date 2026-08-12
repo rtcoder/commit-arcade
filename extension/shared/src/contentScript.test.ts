@@ -84,8 +84,11 @@ describe('initializeCommitArcade', () => {
     playButton?.click();
 
     const picker = document.querySelector('.commit-arcade-picker');
+    const menuBoard = document.querySelector('.commit-arcade-board');
 
-    expect(picker?.previousElementSibling).toBe(playButton);
+    expect(menuBoard?.previousElementSibling).toBe(svg);
+    expect(picker?.parentElement).toBe(menuBoard);
+    expect(playButton?.previousElementSibling).toBe(menuBoard);
 
     document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
 
@@ -95,6 +98,42 @@ describe('initializeCommitArcade', () => {
     expect(board?.previousElementSibling).toBe(svg);
     expect(playButton?.previousElementSibling).toBe(board);
     expect(session?.previousElementSibling).toBe(playButton);
+
+    controller.destroy();
+  });
+
+  it('loops board menu selection with arrows, starts with Enter, and closes with Escape', () => {
+    document.body.innerHTML = contributionGraphFixture();
+
+    const controller = initializeCommitArcade(document);
+    const playButton = document.querySelector<HTMLButtonElement>('.commit-arcade-button');
+
+    playButton?.click();
+
+    const pickerItems = document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item');
+
+    expect(document.querySelector('.commit-arcade-picker')?.parentElement).toBe(document.querySelector('.commit-arcade-board'));
+    expect(pickerItems[0]?.getAttribute('aria-selected')).toBe('true');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'ArrowUp'}));
+
+    expect(pickerItems[pickerItems.length - 1]?.getAttribute('aria-selected')).toBe('true');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'ArrowDown'}));
+
+    expect(pickerItems[0]?.getAttribute('aria-selected')).toBe('true');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Enter'}));
+
+    expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Commit Runner');
+
+    document.querySelector<HTMLButtonElement>('.commit-arcade-stop-button')?.click();
+    playButton?.click();
+    window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Escape'}));
+
+    expect(document.querySelector('.commit-arcade-picker')).toBeNull();
+    expect(document.querySelector('.commit-arcade-board')).toBeNull();
+    expect(playButton?.textContent).toContain('Play');
 
     controller.destroy();
   });
