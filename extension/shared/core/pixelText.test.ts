@@ -1,8 +1,15 @@
 import {describe, expect, it} from 'vitest';
 
-import {createPixelMenuFrame} from './pixelText';
+import {PIXEL_FONT, createPixelMenuFrame} from './pixelText';
 
 describe('createPixelMenuFrame', () => {
+  it('keeps every source glyph declared as five rows of five pixels', () => {
+    for (const glyph of Object.values(PIXEL_FONT)) {
+      expect(glyph).toHaveLength(5);
+      expect(glyph.every((row) => row.length === 5)).toBe(true);
+    }
+  });
+
   it('renders menu labels into board pixels with a highlighted selected row', () => {
     const frame = createPixelMenuFrame({
       labels: ['RUN', 'SNAKE'],
