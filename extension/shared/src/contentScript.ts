@@ -5,7 +5,9 @@ import { gameRegistry } from '../core/gameRegistry';
 import { createInputManager } from '../core/inputManager';
 import { loadSettings, saveSettings, type CommitArcadeSettings, type CommitArcadeSettingsStorage } from '../core/settings';
 import { restoreSnapshot, snapshotCells, type GraphSnapshot } from '../core/stateSnapshot';
+import { createBreakoutGame } from '../games/breakout/breakoutGame';
 import { createFlappyGame } from '../games/flappy/flappyGame';
+import { createPongGame } from '../games/pong/pongGame';
 import { createRunnerGame } from '../games/runner/runnerGame';
 import { createSnakeGame } from '../games/snake/snakeGame';
 import type { CommitArcadeGame, GameMetadata } from '../core/gameTypes';
@@ -326,6 +328,10 @@ function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['game
       return createSnakeGame();
     case 'flappy':
       return createFlappyGame();
+    case 'pong':
+      return createPongGame();
+    case 'breakout':
+      return createBreakoutGame();
     default:
       return null;
   }
@@ -406,6 +412,10 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
       return new Set(['ArrowUp', 'ArrowDown', ' ', 'Space', 'Escape']);
     case 'flappy':
       return new Set(['ArrowUp', ' ', 'Space', 'Escape']);
+    case 'pong':
+      return new Set(['ArrowUp', 'ArrowDown', 'w', 's', 'W', 'S', 'Escape']);
+    case 'breakout':
+      return new Set(['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D', 'Escape']);
     default:
       return new Set(['Escape']);
   }
@@ -419,6 +429,10 @@ function controlsHelpForGame(gameId: string): string {
       return 'Jump with Up or Space. Esc stops.';
     case 'flappy':
       return 'Flap with Up or Space. Esc stops.';
+    case 'pong':
+      return 'Move paddle with Up/Down or W/S. Esc stops.';
+    case 'breakout':
+      return 'Move paddle with Left/Right or A/D. Esc stops.';
     default:
       return 'Esc stops.';
   }

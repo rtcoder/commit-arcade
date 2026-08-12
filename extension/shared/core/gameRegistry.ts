@@ -23,13 +23,13 @@ export const gameRegistry: readonly GameMetadata[] = [
     id: 'pong',
     name: 'Pong',
     description: 'One-player Pong against an imperfect AI paddle.',
-    status: 'planned',
+    status: 'playable',
   },
   {
     id: 'breakout',
     name: 'Breakout',
     description: 'Break top-row bricks with a quantized paddle and ball.',
-    status: 'planned',
+    status: 'playable',
   },
   {
     id: 'space-invaders',
