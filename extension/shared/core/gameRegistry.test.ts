@@ -7,11 +7,7 @@ describe('gameRegistry', () => {
     const playable = gameRegistry.filter((game) => game.status === 'playable').map((game) => game.id);
     const planned = gameRegistry.filter((game) => game.status === 'planned').map((game) => game.id);
 
-    expect(playable).toEqual(['runner', 'snake', 'flappy', 'pong', 'breakout', 'space-invaders', 'frogger']);
-    expect(planned).toEqual([
-      'tron',
-      'helicopter',
-      'rhythm',
-    ]);
+    expect(playable).toEqual(['runner', 'snake', 'flappy', 'pong', 'breakout', 'space-invaders', 'tron', 'frogger', 'helicopter', 'rhythm']);
+    expect(planned).toEqual([]);
   });
 });

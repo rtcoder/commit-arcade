@@ -41,7 +41,7 @@ export const gameRegistry: readonly GameMetadata[] = [
     id: 'tron',
     name: 'Tron',
     description: 'Light-cycle trails in a narrow contribution arena.',
-    status: 'planned',
+    status: 'playable',
   },
   {
     id: 'frogger',
@@ -53,12 +53,12 @@ export const gameRegistry: readonly GameMetadata[] = [
     id: 'helicopter',
     name: 'Helicopter',
     description: 'One-button flight through a scrolling tunnel.',
-    status: 'planned',
+    status: 'playable',
   },
   {
     id: 'rhythm',
     name: 'Commit Beat',
     description: 'A minimal lane rhythm game for commit timelines.',
-    status: 'planned',
+    status: 'playable',
   },
 ];
