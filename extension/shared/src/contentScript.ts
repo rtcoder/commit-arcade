@@ -116,7 +116,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     }, {
       signal: abortController.signal,
     });
-    graph.container.insertAdjacentElement('afterbegin', button);
+    graph.container.append(button);
     ownedElements.push(button);
     root.addEventListener(
       'visibilitychange',
@@ -381,7 +381,7 @@ function showMessage(root: Document, container: Element, ownedElements: Element[
   message.className = 'commit-arcade-message';
   message.setAttribute('role', 'status');
   message.textContent = text;
-  container.insertAdjacentElement('afterbegin', message);
+  container.append(message);
   ownedElements.push(message);
 }
 
@@ -400,7 +400,7 @@ function showSession(root: Document, container: Element, ownedElements: Element[
   session.className = 'commit-arcade-session';
   session.setAttribute('role', 'status');
   renderSessionContent(session, model);
-  container.insertAdjacentElement('afterbegin', session);
+  container.append(session);
   ownedElements.push(session);
   return session;
 }

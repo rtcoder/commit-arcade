@@ -72,6 +72,32 @@ describe('initializeCommitArcade', () => {
     expect(document.querySelector('.commit-arcade-button')).toBeNull();
   });
 
+  it('places controls and the arcade board below the contribution graph', () => {
+    document.body.innerHTML = contributionGraphFixture();
+
+    const controller = initializeCommitArcade(document);
+    const svg = document.querySelector('svg');
+    const playButton = document.querySelector<HTMLButtonElement>('.commit-arcade-button');
+
+    expect(playButton?.previousElementSibling).toBe(svg);
+
+    playButton?.click();
+
+    const picker = document.querySelector('.commit-arcade-picker');
+
+    expect(picker?.previousElementSibling).toBe(playButton);
+
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    const session = document.querySelector('.commit-arcade-session');
+    const board = document.querySelector('.commit-arcade-board');
+
+    expect(session?.previousElementSibling).toBe(playButton);
+    expect(board?.previousElementSibling).toBe(session);
+
+    controller.destroy();
+  });
+
   it('starts a playable game in the contribution cells and restores the graph on Stop', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">
