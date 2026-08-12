@@ -1,10 +1,13 @@
 # Pong And Breakout Games Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:
+> executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add Pong and Breakout as playable Commit Arcade games on the GitHub contribution graph.
 
-**Architecture:** Follow the existing `CommitArcadeGame` interface with isolated game modules under `extension/shared/games`. Keep each game deterministic in tests through injected options, and wire them through the existing registry, factory, input and HUD copy paths.
+**Architecture:** Follow the existing `CommitArcadeGame` interface with isolated game modules under
+`extension/shared/games`. Keep each game deterministic in tests through injected options, and wire them through the
+existing registry, factory, input and HUD copy paths.
 
 **Tech Stack:** TypeScript, Vitest, existing Commit Arcade board renderer and game engine.
 
@@ -20,10 +23,12 @@
 ### Task 1: Pong Game
 
 **Files:**
+
 - Create: `extension/shared/games/pong/pongGame.ts`
 - Create: `extension/shared/games/pong/pongGame.test.ts`
 
 **Interfaces:**
+
 - Consumes: `CommitArcadeGame`, `GameContext`, `GameInput`, `createEmptyFrame`.
 - Produces: `createPongGame(options?: PongOptions): CommitArcadeGame`.
 
@@ -35,10 +40,12 @@
 ### Task 2: Breakout Game
 
 **Files:**
+
 - Create: `extension/shared/games/breakout/breakoutGame.ts`
 - Create: `extension/shared/games/breakout/breakoutGame.test.ts`
 
 **Interfaces:**
+
 - Consumes: `CommitArcadeGame`, `GameContext`, `GameInput`, `createEmptyFrame`.
 - Produces: `createBreakoutGame(options?: BreakoutOptions): CommitArcadeGame`.
 
@@ -50,6 +57,7 @@
 ### Task 3: Registry And UI Wiring
 
 **Files:**
+
 - Modify: `extension/shared/core/gameRegistry.ts`
 - Modify: `extension/shared/src/contentScript.ts`
 - Modify: `extension/shared/core/gameRegistry.test.ts`
@@ -57,6 +65,7 @@
 - Modify: `docs/games.html`
 
 **Interfaces:**
+
 - Consumes: `createPongGame`, `createBreakoutGame`.
 - Produces: playable picker entries and controls help for Pong and Breakout.
 

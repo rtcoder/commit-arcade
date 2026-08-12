@@ -1,6 +1,7 @@
 # Edge Add-ons Submission Notes
 
-Commit Arcade uses the Chromium package for Microsoft Edge Add-ons. Microsoft publishes Edge extensions through Partner Center and expects a tested `.zip` package, manifest review, listing details, privacy answers and certification notes.
+Commit Arcade uses the Chromium package for Microsoft Edge Add-ons. Microsoft publishes Edge extensions through Partner
+Center and expects a tested `.zip` package, manifest review, listing details, privacy answers and certification notes.
 
 Official reference: https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension
 

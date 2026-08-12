@@ -47,26 +47,30 @@ Environment:
 
 Observed selectors:
 
-| Profile type | URL | Graph result |
-| --- | --- | --- |
-| Normal public user profile | `https://github.com/octocat?tab=overview` | Overview page exposes a lazy `include-fragment`; graph is loaded from `/users/octocat/contributions`. |
+| Profile type                        | URL                                              | Graph result                                                                                                                                                      |
+|-------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Normal public user profile          | `https://github.com/octocat?tab=overview`        | Overview page exposes a lazy `include-fragment`; graph is loaded from `/users/octocat/contributions`.                                                             |
 | Normal public contribution fragment | `https://github.com/users/octocat/contributions` | Contribution graph present; 367 `td.ContributionCalendar-day[data-date][data-level]` cells in `extension/shared/test/fixtures/github/octocat-contributions.html`. |
-| Organization profile | `https://github.com/openai` | No personal contribution graph, expected no-op target. Captured in `extension/shared/test/fixtures/github/openai-organization-overview.html`. |
-| Missing graph fixture | local fixture | No contribution graph, expected no-op target. Captured in `extension/shared/test/fixtures/github/missing-contribution-graph.html`. |
-| Empty graph fixture | local fixture | Contribution graph exists with all zero-intensity cells. Captured in `extension/shared/test/fixtures/github/empty-contribution-graph.html`. |
-| Narrow graph fixture | local fixture | Contribution graph exists in compact table markup. Captured in `extension/shared/test/fixtures/github/narrow-contribution-graph.html`. |
+| Organization profile                | `https://github.com/openai`                      | No personal contribution graph, expected no-op target. Captured in `extension/shared/test/fixtures/github/openai-organization-overview.html`.                     |
+| Missing graph fixture               | local fixture                                    | No contribution graph, expected no-op target. Captured in `extension/shared/test/fixtures/github/missing-contribution-graph.html`.                                |
+| Empty graph fixture                 | local fixture                                    | Contribution graph exists with all zero-intensity cells. Captured in `extension/shared/test/fixtures/github/empty-contribution-graph.html`.                       |
+| Narrow graph fixture                | local fixture                                    | Contribution graph exists in compact table markup. Captured in `extension/shared/test/fixtures/github/narrow-contribution-graph.html`.                            |
 
 Findings:
 
 - GitHub's current public profile graph is table-based, not SVG-based.
-- The graph remains contribution-labeled through `.js-yearly-contributions`, `.js-calendar-graph`, `.ContributionCalendar-grid`, and `td.ContributionCalendar-day`.
-- The extension selector path that includes `[data-date][data-level]` is required for the current production DOM; relying only on SVG `rect` would miss the 2026-08-11 GitHub markup.
+- The graph remains contribution-labeled through `.js-yearly-contributions`, `.js-calendar-graph`,
+  `.ContributionCalendar-grid`, and `td.ContributionCalendar-day`.
+- The extension selector path that includes `[data-date][data-level]` is required for the current production DOM;
+  relying only on SVG `rect` would miss the 2026-08-11 GitHub markup.
 - Organization and missing-profile pages do not expose a personal graph and should not receive a Commit Arcade button.
-- Tests cover current public markup, legacy SVG markup, empty graphs, narrow table-like graphs, unrelated date rectangles, and no-graph pages.
+- Tests cover current public markup, legacy SVG markup, empty graphs, narrow table-like graphs, unrelated date
+  rectangles, and no-graph pages.
 
 ### Missing or Unsupported Graph
 
-- Risk: private/limited profiles, failed GitHub rendering, organization pages, or non-profile pages may have no contribution graph.
+- Risk: private/limited profiles, failed GitHub rendering, organization pages, or non-profile pages may have no
+  contribution graph.
 - Expected behavior: return `null`; content script must not modify the page.
 
 Covered by:

@@ -55,4 +55,5 @@ Commit Arcade does not request extension permissions or host_permissions. It dec
 
 - Assets use the Commit Arcade name and abstract contribution-grid visuals.
 - Assets do not use Google, Chrome, GitHub or Octocat logos.
-- The screenshot is a synthetic product screenshot focused on the actual extension experience: a contribution-style graph with the Commit Arcade session UI visible.
+- The screenshot is a synthetic product screenshot focused on the actual extension experience: a contribution-style
+  graph with the Commit Arcade session UI visible.

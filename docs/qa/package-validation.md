@@ -17,7 +17,8 @@ The validator checks:
 - Firefox build uses `manifest_version: 2`.
 - Manifest name, version, description, GitHub content-script match, JavaScript and CSS entries are present.
 - Required extension icons exist at 16, 32, 48, 96, 128 and 256 px.
-- Generated packages do not include local dependencies, repository metadata, Codex files, IDE config, package manifests, private keys or unexpectedly large files.
+- Generated packages do not include local dependencies, repository metadata, Codex files, IDE config, package manifests,
+  private keys or unexpectedly large files.
 
 Manual store checks still required:
 
@@ -39,11 +40,13 @@ Each archive unzips directly into an extension root and includes:
 - `content.css`
 - `assets/**`
 
-Store archives intentionally exclude source maps and source TypeScript files. Firefox AMO source-review material is handled separately from these installable extension archives.
+Store archives intentionally exclude source maps and source TypeScript files. Firefox AMO source-review material is
+handled separately from these installable extension archives.
 
 See `docs/qa/amo-source-submission.md` for Firefox source-review package instructions.
 
-Safari packaging is handled separately through Xcode using `extension/chrome/build` as the WebExtension input. See `extension/safari/README.md`.
+Safari packaging is handled separately through Xcode using `extension/chrome/build` as the WebExtension input. See
+`extension/safari/README.md`.
 
 ## V1.0.0 Browser Availability Smoke
 
@@ -57,4 +60,5 @@ Recorded on macOS 26.5.2 during release-candidate QA:
 - Safari 26.5.2
 - Vivaldi unavailable locally
 
-Chrome, Edge, Brave and Opera share the Chromium package path. Firefox uses the dedicated MV2 package path. Safari remains a documented conversion target, not an automated archive target.
+Chrome, Edge, Brave and Opera share the Chromium package path. Firefox uses the dedicated MV2 package path. Safari
+remains a documented conversion target, not an automated archive target.

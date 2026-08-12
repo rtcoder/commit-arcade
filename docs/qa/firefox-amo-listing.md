@@ -96,4 +96,5 @@ Prepare a square PNG listing icon even though the runtime extension package incl
 - Firefox manifest scope is only `https://github.com/*`.
 - No `permissions` or `host_permissions` are declared.
 - CSP is `script-src 'self'; object-src 'self';`.
-- Privacy copy must say that nothing is collected or transmitted, while acknowledging that preferences and high scores stay local in browser storage.
+- Privacy copy must say that nothing is collected or transmitted, while acknowledging that preferences and high scores
+  stay local in browser storage.

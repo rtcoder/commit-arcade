@@ -43,4 +43,5 @@ Reference captures:
 
 ## Remaining Manual Evidence
 
-The reference captures in this directory are static fixtures for review. Final beta smoke should still capture screenshots from real GitHub pages for CA-38 and CA-45.
+The reference captures in this directory are static fixtures for review. Final beta smoke should still capture
+screenshots from real GitHub pages for CA-38 and CA-45.
