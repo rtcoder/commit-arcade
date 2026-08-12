@@ -24,6 +24,25 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 
+  it('injects the Play control when GitHub lazy-loads the contribution graph after startup', async () => {
+    document.body.innerHTML = '<main><h1>Profile</h1></main>';
+    delete document.documentElement.dataset.commitArcadeReady;
+
+    const controller = initializeCommitArcade(document);
+
+    expect(document.querySelector('.commit-arcade-button')).toBeNull();
+
+    document.querySelector('main')?.insertAdjacentHTML('beforeend', contributionGraphFixture());
+    await flushPromises();
+
+    const playButton = document.querySelector<HTMLButtonElement>('.commit-arcade-button');
+
+    expect(playButton?.textContent).toContain('Play');
+    expect(document.documentElement.dataset.commitArcadeReady).toBe('true');
+
+    controller.destroy();
+  });
+
   it('injects one Play control for a contribution graph and removes it on destroy', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">

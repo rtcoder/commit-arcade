@@ -24,6 +24,13 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   const ownedElements: Element[] = [];
   const view = root.defaultView ?? window;
   const inputManager = createInputManager(view);
+  const lazyGraphObserver = new view.MutationObserver(() => {
+    if (activeGraph !== null) {
+      return;
+    }
+    activeGraph = findContributionGraph(root);
+    installGraph();
+  });
   let activeGraph = findContributionGraph(root);
   let activeEngine: GameEngine | null = null;
   let activeSnapshot: GraphSnapshot | null = null;
@@ -45,6 +52,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   });
 
   installGraph();
+  lazyGraphObserver.observe(root.documentElement, { childList: true, subtree: true });
   root.addEventListener('turbo:render', rescanGraph, { signal: abortController.signal });
   view.addEventListener('popstate', rescanGraph, { signal: abortController.signal });
 
@@ -52,6 +60,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     destroy(): void {
       stopGame(null);
       inputManager.destroy();
+      lazyGraphObserver.disconnect();
       abortController.abort();
       removeOwnedElements();
       delete root.documentElement.dataset.commitArcadeReady;
