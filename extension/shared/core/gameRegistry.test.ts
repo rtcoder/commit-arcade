@@ -20,6 +20,8 @@ describe('gameRegistry', () => {
       'rhythm',
       'missile-command',
       'centipede',
+      'tetris',
+      'asteroids',
     ]);
     expect(planned).toEqual([]);
   });

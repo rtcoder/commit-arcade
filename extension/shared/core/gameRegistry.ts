@@ -73,4 +73,16 @@ export const gameRegistry: readonly GameMetadata[] = [
     description: 'Shoot a descending segmented bug before it reaches your row.',
     status: 'playable',
   },
+  {
+    id: 'tetris',
+    name: 'Mini Tetris',
+    description: 'Compact falling blocks on the contribution grid.',
+    status: 'playable',
+  },
+  {
+    id: 'asteroids',
+    name: 'Asteroids',
+    description: 'Dodge and shoot drifting asteroids on the contribution grid.',
+    status: 'playable',
+  },
 ];

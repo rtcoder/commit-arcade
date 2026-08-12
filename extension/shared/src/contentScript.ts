@@ -11,6 +11,7 @@ import {
   saveSettings,
 } from '../core/settings';
 import {type GraphSnapshot, restoreSnapshot, snapshotCells} from '../core/stateSnapshot';
+import {createAsteroidsGame} from '../games/asteroids/asteroidsGame';
 import {createBreakoutGame} from '../games/breakout/breakoutGame';
 import {createFlappyGame} from '../games/flappy/flappyGame';
 import {createFroggerGame} from '../games/frogger/froggerGame';
@@ -22,6 +23,7 @@ import {createRhythmGame} from '../games/rhythm/rhythmGame';
 import {createRunnerGame} from '../games/runner/runnerGame';
 import {createSnakeGame} from '../games/snake/snakeGame';
 import {createSpaceInvadersGame} from '../games/spaceInvaders/spaceInvadersGame';
+import {createTetrisGame} from '../games/tetris/tetrisGame';
 import {createTronGame} from '../games/tron/tronGame';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
@@ -358,6 +360,10 @@ function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['game
       return createMissileCommandGame();
     case 'centipede':
       return createCentipedeGame();
+    case 'tetris':
+      return createTetrisGame();
+    case 'asteroids':
+      return createAsteroidsGame();
     default:
       return null;
   }
@@ -455,6 +461,10 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
     case 'missile-command':
     case 'centipede':
       return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
+    case 'tetris':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'a', 'd', 's', 'A', 'D', 'S', 'Escape']);
+    case 'asteroids':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
     default:
       return new Set(['Escape']);
   }
@@ -485,6 +495,10 @@ function controlsHelpForGame(gameId: string): string {
     case 'missile-command':
       return 'Move with Left/Right, fire with Up or Space. Esc stops.';
     case 'centipede':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
+    case 'tetris':
+      return 'Move with Left/Right, drop with Down. Esc stops.';
+    case 'asteroids':
       return 'Move with Left/Right, fire with Up or Space. Esc stops.';
     default:
       return 'Esc stops.';
