@@ -66,6 +66,8 @@ describe('v1 public website content', () => {
     expect(games).toContain('Tron');
     expect(games).toContain('Helicopter');
     expect(games).toContain('Commit Beat');
+    expect(games).toContain('Missile Command');
+    expect(games).toContain('Centipede');
     expect(games).toContain('Arrow keys');
     expect(games).toContain('Space');
     expect(games).toContain('Escape');

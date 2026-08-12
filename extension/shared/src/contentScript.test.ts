@@ -253,7 +253,7 @@ describe('initializeCommitArcade', () => {
     document.body.innerHTML = contributionGraphFixture();
 
     const controller = initializeCommitArcade(document);
-    for (const gameName of ['Pong', 'Breakout', 'Space Invaders', 'Tron', 'Frogger', 'Helicopter', 'Commit Beat']) {
+    for (const gameName of ['Pong', 'Breakout', 'Space Invaders', 'Tron', 'Frogger', 'Helicopter', 'Commit Beat', 'Missile Command', 'Centipede']) {
       document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
       const item = Array.from(document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')).find((button) =>
         button.textContent?.includes(gameName),

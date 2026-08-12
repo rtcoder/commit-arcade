@@ -15,6 +15,8 @@ import {createBreakoutGame} from '../games/breakout/breakoutGame';
 import {createFlappyGame} from '../games/flappy/flappyGame';
 import {createFroggerGame} from '../games/frogger/froggerGame';
 import {createHelicopterGame} from '../games/helicopter/helicopterGame';
+import {createCentipedeGame} from '../games/centipede/centipedeGame';
+import {createMissileCommandGame} from '../games/missileCommand/missileCommandGame';
 import {createPongGame} from '../games/pong/pongGame';
 import {createRhythmGame} from '../games/rhythm/rhythmGame';
 import {createRunnerGame} from '../games/runner/runnerGame';
@@ -352,6 +354,10 @@ function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['game
       return createHelicopterGame();
     case 'rhythm':
       return createRhythmGame();
+    case 'missile-command':
+      return createMissileCommandGame();
+    case 'centipede':
+      return createCentipedeGame();
     default:
       return null;
   }
@@ -446,6 +452,9 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
       return new Set(['ArrowUp', ' ', 'Space', 'Escape']);
     case 'rhythm':
       return new Set(['ArrowLeft', 'ArrowDown', 'ArrowUp', 'ArrowRight', 'a', 's', 'd', 'f', 'A', 'S', 'D', 'F', 'Escape']);
+    case 'missile-command':
+    case 'centipede':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
     default:
       return new Set(['Escape']);
   }
@@ -473,6 +482,10 @@ function controlsHelpForGame(gameId: string): string {
       return 'Hold Up or Space to rise. Esc stops.';
     case 'rhythm':
       return 'Hit lanes with A/S/D/F or arrows. Esc stops.';
+    case 'missile-command':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
+    case 'centipede':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
     default:
       return 'Esc stops.';
   }
