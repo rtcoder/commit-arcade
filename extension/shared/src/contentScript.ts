@@ -2,9 +2,10 @@ import {type ArcadeBoard, createArcadeBoard} from '../core/arcadeBoard';
 import {createBoardRenderer} from '../core/boardRenderer';
 import {createGameEngine, type GameEngine} from '../core/gameEngine';
 import {gameRegistry} from '../core/gameRegistry';
-import type {CommitArcadeGame, GameMetadata} from '../core/gameTypes';
+import type {BoardRenderer, CommitArcadeGame, GameMetadata} from '../core/gameTypes';
 import {findContributionGraph} from '../core/githubContributionGraph';
 import {createInputManager} from '../core/inputManager';
+import {createPixelMenuFrame} from '../core/pixelText';
 import {
   type CommitArcadeSettings,
   type CommitArcadeSettingsStorage,
@@ -63,7 +64,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeSession: HTMLElement | null = null;
   let activeMenu: HTMLElement | null = null;
   let activeMenuGames: readonly GameMetadata[] = [];
+  let activeMenuRenderer: BoardRenderer | null = null;
   let activeMenuSelection = 0;
+  let activeMenuDetail: HTMLElement | null = null;
   const highScores: Record<string, number> = {};
   let selectedGame = 'runner';
   let settingsLoaded = options.storage === undefined;
@@ -157,6 +160,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeMenu?.remove();
     activeMenu = null;
     activeMenuGames = [];
+    activeMenuRenderer = null;
+    activeMenuDetail?.remove();
+    activeMenuDetail = null;
     inputManager.deactivate();
     activeGame = playableGame;
     activeScore = 0;
@@ -225,6 +231,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeMenu?.remove();
     activeMenu = null;
     activeMenuGames = [];
+    activeMenuRenderer = null;
+    activeMenuDetail?.remove();
+    activeMenuDetail = null;
     if (activeSnapshot !== null) {
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
@@ -255,6 +264,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     board.element.removeAttribute('aria-hidden');
     activeMenuGames = orderedGames(selectedGame);
     activeMenuSelection = 0;
+    activeMenuRenderer = createBoardRenderer(board.graph);
     activeMenu = showBoardGameMenu(root, board.element, activeMenuGames, activeMenuSelection, {
       onChoose: (game) => startGame(game, button),
       onHover: (index) => {
@@ -262,6 +272,8 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         renderMenuSelection();
       },
     });
+    activeMenuDetail = showMenuDetail(root, button, activeMenuGames[activeMenuSelection]);
+    renderMenuSelection();
     inputManager.activate(new Set(['ArrowUp', 'ArrowDown', 'Enter', 'Escape']), (input) => {
       if (input.type !== 'down' || activeMenu === null) {
         return;
@@ -290,6 +302,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeMenu?.remove();
     activeMenu = null;
     activeMenuGames = [];
+    activeMenuRenderer = null;
+    activeMenuDetail?.remove();
+    activeMenuDetail = null;
     if (activeSnapshot !== null) {
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
@@ -317,6 +332,12 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       return;
     }
     updateBoardGameMenuSelection(activeMenu, activeMenuSelection);
+    activeMenuRenderer?.render(createPixelMenuFrame({
+      labels: activeMenuGames.map((game) => menuLabelForGame(game.id)),
+      selectedIndex: activeMenuSelection,
+      size: activeArcadeBoard?.graph.size ?? {columns: 1, rows: 1},
+    }));
+    renderMenuDetail(activeMenuDetail, activeMenuGames[activeMenuSelection]);
   }
 
   function restartGame(button: HTMLButtonElement): void {
@@ -413,6 +434,33 @@ function showBoardGameMenu(
   return picker;
 }
 
+function showMenuDetail(root: Document, button: HTMLButtonElement, game: GameMetadata | undefined): HTMLElement {
+  button.parentElement?.querySelector('.commit-arcade-menu-detail')?.remove();
+  const detail = root.createElement('div');
+  detail.className = 'commit-arcade-menu-detail';
+  detail.setAttribute('role', 'status');
+  renderMenuDetail(detail, game);
+  button.insertAdjacentElement('afterend', detail);
+  return detail;
+}
+
+function renderMenuDetail(detail: HTMLElement | null, game: GameMetadata | undefined): void {
+  if (detail === null || game === undefined) {
+    return;
+  }
+  detail.replaceChildren();
+
+  const title = detail.ownerDocument.createElement('span');
+  title.className = 'commit-arcade-menu-detail-title';
+  title.textContent = game.name;
+
+  const description = detail.ownerDocument.createElement('span');
+  description.className = 'commit-arcade-menu-detail-description';
+  description.textContent = game.description;
+
+  detail.append(title, description);
+}
+
 function orderedGames(selectedGame: string): readonly GameMetadata[] {
   const selected = gameRegistry.find((game) => game.id === selectedGame);
   if (selected === undefined) {
@@ -438,6 +486,41 @@ function wrapMenuSelection(index: number, length: number): number {
     return 0;
   }
   return (index + length) % length;
+}
+
+function menuLabelForGame(gameId: string): string {
+  switch (gameId) {
+    case 'runner':
+      return 'RUNNER';
+    case 'snake':
+      return 'SNAKE';
+    case 'flappy':
+      return 'FLAPPY';
+    case 'pong':
+      return 'PONG';
+    case 'breakout':
+      return 'BREAK';
+    case 'space-invaders':
+      return 'INVADER';
+    case 'tron':
+      return 'TRON';
+    case 'frogger':
+      return 'FROG';
+    case 'helicopter':
+      return 'HELI';
+    case 'rhythm':
+      return 'BEAT';
+    case 'missile-command':
+      return 'MISSILE';
+    case 'centipede':
+      return 'CENTI';
+    case 'tetris':
+      return 'TETRIS';
+    case 'asteroids':
+      return 'ROIDS';
+    default:
+      return gameId.toUpperCase().slice(0, 7);
+  }
 }
 
 function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['gameFactories'] = {}): CommitArcadeGame | null {

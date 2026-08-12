@@ -139,35 +139,35 @@
 }
 
 .commit-arcade-board-menu.commit-arcade-picker {
-    align-content: center;
-    background: color-mix(in srgb, var(--color-canvas-overlay, #ffffff) 86%, transparent);
     border: 0;
-    border-radius: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
     box-shadow: none;
-    gap: 3px;
-    inset: 6px;
-    justify-content: center;
-    margin: 0;
-    max-width: none;
+    height: 1px;
+    margin: -1px;
     overflow: hidden;
-    padding: 6px;
+    padding: 0;
     position: absolute;
-    z-index: 1;
+    white-space: nowrap;
+    width: 1px;
 }
 
-.commit-arcade-board-menu-item.commit-arcade-picker-item {
-    border-radius: 3px;
-    font-size: 11px;
+.commit-arcade-menu-detail {
+    align-items: baseline;
+    color: var(--color-fg-default, #24292f);
+    display: flex;
+    flex-wrap: wrap;
+    font: inherit;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.commit-arcade-menu-detail-title {
     font-weight: 600;
-    line-height: 1.1;
-    min-height: 0;
-    padding: 3px 8px;
-    text-align: center;
 }
 
-.commit-arcade-board-menu-item[aria-selected='true'] {
-    background: var(--commit-arcade-accent);
-    color: #ffffff;
+.commit-arcade-menu-detail-description {
+    color: var(--commit-arcade-dim);
 }
 
 @media (max-width: 480px) {

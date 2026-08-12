@@ -89,6 +89,8 @@ describe('initializeCommitArcade', () => {
     expect(menuBoard?.previousElementSibling).toBe(svg);
     expect(picker?.parentElement).toBe(menuBoard);
     expect(playButton?.previousElementSibling).toBe(menuBoard);
+    expect(document.querySelectorAll('.commit-arcade-board-cell[data-commit-arcade-state]')).not.toHaveLength(0);
+    expect(document.querySelector<HTMLElement>('.commit-arcade-menu-detail')?.textContent).toContain('Commit Runner');
 
     document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
 
