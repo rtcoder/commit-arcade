@@ -23,6 +23,21 @@ describe('createPixelMenuFrame', () => {
     expect(frame.flat().filter((state) => state === 'player').length).toBeGreaterThan(0);
   });
 
+  it('centers the selected label between clipped previous and next labels', () => {
+    const frame = createPixelMenuFrame({
+      labels: ['PREV', 'SEL', 'NEXT'],
+      selectedIndex: 1,
+      size: {columns: 53, rows: 21},
+    });
+    const playerRows = rowsContaining(frame, 'player');
+    const accentRows = rowsContaining(frame, 'accent');
+
+    expect(playerRows).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+    expect(accentRows.some((row) => row < 6)).toBe(true);
+    expect(accentRows.some((row) => row > 15)).toBe(true);
+    expect(accentRows.every((row) => row < 6 || row > 15)).toBe(true);
+  });
+
   it('draws each glyph in a five by ten pixel box', () => {
     const frame = createPixelMenuFrame({
       labels: ['I'],
@@ -39,3 +54,7 @@ describe('createPixelMenuFrame', () => {
     expect(markedColumns.size).toBe(5);
   });
 });
+
+function rowsContaining(frame: ReturnType<typeof createPixelMenuFrame>, state: 'accent' | 'player'): number[] {
+  return frame.flatMap((row, rowIndex) => row.includes(state) ? [rowIndex] : []);
+}

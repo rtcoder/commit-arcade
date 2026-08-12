@@ -11,7 +11,6 @@ const GLYPH_WIDTH = 5;
 const SOURCE_GLYPH_HEIGHT = 5;
 const SOURCE_GLYPH_WIDTH = 5;
 const GLYPH_GAP = 1;
-const ROW_GAP = 1;
 
 export const PIXEL_FONT: Record<string, readonly string[]> = {
   ' ': ['00000', '00000', '00000', '00000', '00000'],
@@ -45,27 +44,28 @@ export const PIXEL_FONT: Record<string, readonly string[]> = {
 
 export function createPixelMenuFrame(options: PixelMenuOptions): BoardFrame {
   const frame = createEmptyFrame(options.size);
-  const visibleLabels = visibleMenuLabels(options.labels, options.selectedIndex, options.size.rows);
-  const blockHeight = visibleLabels.length * GLYPH_HEIGHT + Math.max(0, visibleLabels.length - 1) * ROW_GAP;
-  let row = Math.max(0, Math.floor((options.size.rows - blockHeight) / 2));
+  const visibleLabels = wheelMenuLabels(options.labels, options.selectedIndex);
+  const selectedRow = Math.max(0, Math.ceil((options.size.rows - GLYPH_HEIGHT) / 2));
 
   for (const entry of visibleLabels) {
     const state: PixelState = entry.index === options.selectedIndex ? 'player' : 'accent';
+    const row = selectedRow + entry.offset * GLYPH_HEIGHT;
     drawText(frame, entry.label, row, centeredColumn(entry.label, options.size.columns), state);
-    row += GLYPH_HEIGHT + ROW_GAP;
   }
 
   return frame;
 }
 
-function visibleMenuLabels(labels: readonly string[], selectedIndex: number, rows: number): Array<{index: number; label: string}> {
-  const capacity = Math.max(1, Math.floor((rows + ROW_GAP) / (GLYPH_HEIGHT + ROW_GAP)));
-  const count = Math.min(labels.length, capacity);
-  const before = Math.floor((count - 1) / 2);
-  const start = selectedIndex - before;
-  return Array.from({length: count}, (_, offset) => {
-    const index = wrapIndex(start + offset, labels.length);
-    return {index, label: labels[index] ?? ''};
+function wheelMenuLabels(labels: readonly string[], selectedIndex: number): Array<{index: number; label: string; offset: number}> {
+  if (labels.length <= 0) {
+    return [];
+  }
+  if (labels.length === 1) {
+    return [{index: 0, label: labels[0] ?? '', offset: 0}];
+  }
+  return [-1, 0, 1].map((offset) => {
+    const index = wrapIndex(selectedIndex + offset, labels.length);
+    return {index, label: labels[index] ?? '', offset};
   });
 }
 
