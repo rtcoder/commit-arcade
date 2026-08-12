@@ -89,4 +89,12 @@ describe('theme and responsive QA assets', () => {
     expect(qa).toContain('GitHub dark dimmed theme');
     expect(qa).toContain('Narrow mobile-ish profile layouts');
   });
+
+  it('colors both SVG and table-based GitHub contribution cells during gameplay', async () => {
+    const css = await readText('extension/shared/styles/content.css');
+
+    expect(css).toMatch(/data-commit-arcade-state='player'][\s\S]*fill: var\(--commit-arcade-player\);[\s\S]*background-color: var\(--commit-arcade-player\);/);
+    expect(css).toMatch(/data-commit-arcade-state='enemy'][\s\S]*fill: var\(--commit-arcade-enemy\);[\s\S]*background-color: var\(--commit-arcade-enemy\);/);
+    expect(css).toMatch(/data-commit-arcade-state='bonus'][\s\S]*fill: var\(--commit-arcade-accent\);[\s\S]*background-color: var\(--commit-arcade-accent\);/);
+  });
 });

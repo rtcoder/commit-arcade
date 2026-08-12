@@ -140,19 +140,23 @@
 
 .commit-arcade-cell[data-commit-arcade-state='player'] {
   fill: var(--commit-arcade-player);
+  background-color: var(--commit-arcade-player);
 }
 
 .commit-arcade-cell[data-commit-arcade-state='enemy'],
 .commit-arcade-cell[data-commit-arcade-state='obstacle'] {
   fill: var(--commit-arcade-enemy);
+  background-color: var(--commit-arcade-enemy);
 }
 
 .commit-arcade-cell[data-commit-arcade-state='bonus'],
 .commit-arcade-cell[data-commit-arcade-state='accent'] {
   fill: var(--commit-arcade-accent);
+  background-color: var(--commit-arcade-accent);
 }
 
 .commit-arcade-cell[data-commit-arcade-state='projectile'],
 .commit-arcade-cell[data-commit-arcade-state='trail'] {
   fill: var(--commit-arcade-danger);
+  background-color: var(--commit-arcade-danger);
 }
