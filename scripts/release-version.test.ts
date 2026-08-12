@@ -4,7 +4,7 @@ import path from 'node:path';
 import {describe, expect, it} from 'vitest';
 
 const ROOT = process.cwd();
-const RELEASE_VERSION = '1.0.0';
+const RELEASE_VERSION = '1.0.3';
 
 async function readJson(filePath: string) {
   return JSON.parse(await readFile(path.join(ROOT, filePath), 'utf8'));
