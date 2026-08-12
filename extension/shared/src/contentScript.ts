@@ -5,7 +5,7 @@ import {gameRegistry} from '../core/gameRegistry';
 import type {BoardRenderer, CommitArcadeGame, GameMetadata} from '../core/gameTypes';
 import {findContributionGraph} from '../core/githubContributionGraph';
 import {createInputManager} from '../core/inputManager';
-import {createPixelMenuFrame} from '../core/pixelText';
+import {PIXEL_MENU_ITEM_STEP_ROWS, createPixelMenuFrame} from '../core/pixelText';
 import {
   type CommitArcadeSettings,
   type CommitArcadeSettingsStorage,
@@ -30,7 +30,6 @@ import {createTronGame} from '../games/tron/tronGame';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
 const MENU_SCROLL_DURATION_MS = 160;
-const MENU_SCROLL_ROWS = 10;
 
 export interface CommitArcadeController {
   destroy(): void;
@@ -350,7 +349,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
 
   function animateMenuSelection(direction: number): void {
     cancelMenuAnimation();
-    const initialOffset = direction * MENU_SCROLL_ROWS;
+    const initialOffset = direction * PIXEL_MENU_ITEM_STEP_ROWS;
     const startedAt = view.performance.now();
     renderMenuSelection(initialOffset);
 

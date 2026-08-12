@@ -33,11 +33,10 @@ describe('createPixelMenuFrame', () => {
     const accentRows = rowsContaining(frame, 'accent');
 
     expect(playerRows).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
-    expect(accentRows.some((row) => row < 6)).toBe(true);
-    expect(accentRows.some((row) => row > 15)).toBe(true);
-    expect(accentRows.every((row) => row < 6 || row > 15)).toBe(true);
-    expect(frame[0]?.every((state) => state === 'empty')).toBe(true);
-    expect(frame[20]?.every((state) => state === 'empty')).toBe(true);
+    expect(accentRows.some((row) => row < 4)).toBe(true);
+    expect(accentRows.some((row) => row > 17)).toBe(true);
+    expect(rowsContaining(frame, 'empty')).toEqual(expect.arrayContaining([4, 5, 16, 17]));
+    expect(accentRows.every((row) => row < 4 || row > 17)).toBe(true);
   });
 
   it('supports intermediate scroll offsets for smooth wheel transitions', () => {
@@ -49,7 +48,7 @@ describe('createPixelMenuFrame', () => {
     });
     const playerRows = rowsContaining(frame, 'player');
 
-    expect(playerRows).toEqual([11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    expect(playerRows).toEqual([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
   });
 
   it('draws each glyph in a five by ten pixel box', () => {
@@ -69,6 +68,6 @@ describe('createPixelMenuFrame', () => {
   });
 });
 
-function rowsContaining(frame: ReturnType<typeof createPixelMenuFrame>, state: 'accent' | 'player'): number[] {
+function rowsContaining(frame: ReturnType<typeof createPixelMenuFrame>, state: 'accent' | 'empty' | 'player'): number[] {
   return frame.flatMap((row, rowIndex) => row.includes(state) ? [rowIndex] : []);
 }

@@ -12,7 +12,7 @@ const GLYPH_WIDTH = 5;
 const SOURCE_GLYPH_HEIGHT = 5;
 const SOURCE_GLYPH_WIDTH = 5;
 const GLYPH_GAP = 1;
-const EDGE_PADDING_ROWS = 1;
+export const PIXEL_MENU_ITEM_STEP_ROWS = 12;
 
 export const PIXEL_FONT: Record<string, readonly string[]> = {
   ' ': ['00000', '00000', '00000', '00000', '00000'],
@@ -52,8 +52,8 @@ export function createPixelMenuFrame(options: PixelMenuOptions): BoardFrame {
 
   for (const entry of visibleLabels) {
     const state: PixelState = entry.index === options.selectedIndex ? 'player' : 'accent';
-    const row = selectedRow + entry.offset * GLYPH_HEIGHT + scrollOffsetRows;
-    drawText(frame, entry.label, row, centeredColumn(entry.label, options.size.columns), state, EDGE_PADDING_ROWS);
+    const row = selectedRow + entry.offset * PIXEL_MENU_ITEM_STEP_ROWS + scrollOffsetRows;
+    drawText(frame, entry.label, row, centeredColumn(entry.label, options.size.columns), state);
   }
 
   return frame;
@@ -72,16 +72,16 @@ function wheelMenuLabels(labels: readonly string[], selectedIndex: number): Arra
   });
 }
 
-function drawText(frame: BoardFrame, text: string, row: number, column: number, state: PixelState, edgePaddingRows: number): void {
+function drawText(frame: BoardFrame, text: string, row: number, column: number, state: PixelState): void {
   const normalized = text.toUpperCase();
   for (let charIndex = 0; charIndex < normalized.length; charIndex += 1) {
     const glyph = PIXEL_FONT[normalized[charIndex] ?? ' '] ?? PIXEL_FONT[' '];
     const glyphColumn = column + charIndex * (GLYPH_WIDTH + GLYPH_GAP);
-    drawGlyph(frame, glyph, row, glyphColumn, state, edgePaddingRows);
+    drawGlyph(frame, glyph, row, glyphColumn, state);
   }
 }
 
-function drawGlyph(frame: BoardFrame, glyph: readonly string[] | undefined, row: number, column: number, state: PixelState, edgePaddingRows: number): void {
+function drawGlyph(frame: BoardFrame, glyph: readonly string[] | undefined, row: number, column: number, state: PixelState): void {
   if (glyph === undefined) {
     return;
   }
@@ -91,12 +91,7 @@ function drawGlyph(frame: BoardFrame, glyph: readonly string[] | undefined, row:
     for (let x = 0; x < GLYPH_WIDTH; x += 1) {
       const sourceY = Math.floor((y * SOURCE_GLYPH_HEIGHT) / GLYPH_HEIGHT);
       const sourceX = Math.floor((x * SOURCE_GLYPH_WIDTH) / GLYPH_WIDTH);
-      if (
-        frameRowIndex >= edgePaddingRows &&
-        frameRowIndex < frame.length - edgePaddingRows &&
-        glyph[sourceY]?.[sourceX] === '1' &&
-        frameRow?.[column + x] !== undefined
-      ) {
+      if (glyph[sourceY]?.[sourceX] === '1' && frameRow?.[column + x] !== undefined) {
         frameRow[column + x] = state;
       }
     }
