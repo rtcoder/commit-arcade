@@ -59,6 +59,13 @@ describe('v1 public website content', () => {
     expect(games).toContain('Commit Runner');
     expect(games).toContain('Snake');
     expect(games).toContain('Flappy Commit');
+    expect(games).toContain('Pong');
+    expect(games).toContain('Breakout');
+    expect(games).toContain('Space Invaders');
+    expect(games).toContain('Frogger');
+    expect(games).toContain('Tron');
+    expect(games).toContain('Helicopter');
+    expect(games).toContain('Commit Beat');
     expect(games).toContain('Arrow keys');
     expect(games).toContain('Space');
     expect(games).toContain('Escape');
@@ -94,7 +101,7 @@ describe('theme and responsive QA assets', () => {
     const css = await readText('extension/shared/styles/content.css');
 
     expect(css).toMatch(
-      /commit-arcade-game-active[\s\S]*ContributionCalendar-day[\s\S]*fill: var\(--commit-arcade-empty\) !important;[\s\S]*background-color: var\(--commit-arcade-empty\) !important;/,
+      /commit-arcade-game-active[\s\S]*ContributionCalendar-day[\s\S]*fill: var\(--contribution-default-bgColor-0\) !important;[\s\S]*background-color: var\(--contribution-default-bgColor-0\) !important;/,
     );
     expect(css).toMatch(
       /data-commit-arcade-state='player'][\s\S]*fill: var\(--commit-arcade-player\) !important;[\s\S]*background-color: var\(--commit-arcade-player\) !important;/,

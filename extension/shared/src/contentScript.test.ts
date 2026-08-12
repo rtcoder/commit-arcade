@@ -64,7 +64,7 @@ describe('initializeCommitArcade', () => {
     playButtons[0]?.click();
 
     expect(document.querySelector('[role="menu"]')?.textContent).toContain('Commit Runner');
-    expect(document.querySelector('[aria-disabled="true"]')?.textContent).toContain('Pong');
+    expect(document.querySelector('[aria-disabled="true"]')).toBeNull();
 
     second.destroy();
     first.destroy();
@@ -245,6 +245,29 @@ describe('initializeCommitArcade', () => {
     snake?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' }));
 
     expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Snake');
+
+    controller.destroy();
+  });
+
+  it('starts newly shipped games from playable picker entries', () => {
+    document.body.innerHTML = contributionGraphFixture();
+
+    const controller = initializeCommitArcade(document);
+    for (const gameName of ['Pong', 'Breakout', 'Space Invaders', 'Tron', 'Frogger', 'Helicopter', 'Commit Beat']) {
+      document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+      const item = Array.from(document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')).find((button) =>
+        button.textContent?.includes(gameName),
+      );
+
+      expect(item?.disabled).toBe(false);
+      expect(item?.getAttribute('aria-label')).toContain(`Start ${gameName}.`);
+
+      item?.click();
+
+      expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain(gameName);
+
+      document.querySelector<HTMLButtonElement>('.commit-arcade-stop-button')?.click();
+    }
 
     controller.destroy();
   });

@@ -5,9 +5,16 @@ import { gameRegistry } from '../core/gameRegistry';
 import { createInputManager } from '../core/inputManager';
 import { loadSettings, saveSettings, type CommitArcadeSettings, type CommitArcadeSettingsStorage } from '../core/settings';
 import { restoreSnapshot, snapshotCells, type GraphSnapshot } from '../core/stateSnapshot';
+import { createBreakoutGame } from '../games/breakout/breakoutGame';
 import { createFlappyGame } from '../games/flappy/flappyGame';
+import { createFroggerGame } from '../games/frogger/froggerGame';
+import { createHelicopterGame } from '../games/helicopter/helicopterGame';
+import { createPongGame } from '../games/pong/pongGame';
+import { createRhythmGame } from '../games/rhythm/rhythmGame';
 import { createRunnerGame } from '../games/runner/runnerGame';
 import { createSnakeGame } from '../games/snake/snakeGame';
+import { createSpaceInvadersGame } from '../games/spaceInvaders/spaceInvadersGame';
+import { createTronGame } from '../games/tron/tronGame';
 import type { CommitArcadeGame, GameMetadata } from '../core/gameTypes';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
@@ -326,6 +333,20 @@ function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['game
       return createSnakeGame();
     case 'flappy':
       return createFlappyGame();
+    case 'pong':
+      return createPongGame();
+    case 'breakout':
+      return createBreakoutGame();
+    case 'space-invaders':
+      return createSpaceInvadersGame();
+    case 'tron':
+      return createTronGame();
+    case 'frogger':
+      return createFroggerGame();
+    case 'helicopter':
+      return createHelicopterGame();
+    case 'rhythm':
+      return createRhythmGame();
     default:
       return null;
   }
@@ -406,6 +427,20 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
       return new Set(['ArrowUp', 'ArrowDown', ' ', 'Space', 'Escape']);
     case 'flappy':
       return new Set(['ArrowUp', ' ', 'Space', 'Escape']);
+    case 'pong':
+      return new Set(['ArrowUp', 'ArrowDown', 'w', 's', 'W', 'S', 'Escape']);
+    case 'breakout':
+      return new Set(['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D', 'Escape']);
+    case 'space-invaders':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
+    case 'tron':
+      return new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D', 'Escape']);
+    case 'frogger':
+      return new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D', 'Escape']);
+    case 'helicopter':
+      return new Set(['ArrowUp', ' ', 'Space', 'Escape']);
+    case 'rhythm':
+      return new Set(['ArrowLeft', 'ArrowDown', 'ArrowUp', 'ArrowRight', 'a', 's', 'd', 'f', 'A', 'S', 'D', 'F', 'Escape']);
     default:
       return new Set(['Escape']);
   }
@@ -419,6 +454,20 @@ function controlsHelpForGame(gameId: string): string {
       return 'Jump with Up or Space. Esc stops.';
     case 'flappy':
       return 'Flap with Up or Space. Esc stops.';
+    case 'pong':
+      return 'Move paddle with Up/Down or W/S. Esc stops.';
+    case 'breakout':
+      return 'Move paddle with Left/Right or A/D. Esc stops.';
+    case 'space-invaders':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
+    case 'tron':
+      return 'Turn with arrows or WASD. Esc stops.';
+    case 'frogger':
+      return 'Hop with arrows or WASD. Esc stops.';
+    case 'helicopter':
+      return 'Hold Up or Space to rise. Esc stops.';
+    case 'rhythm':
+      return 'Hit lanes with A/S/D/F or arrows. Esc stops.';
     default:
       return 'Esc stops.';
   }
