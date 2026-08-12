@@ -164,7 +164,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       status: activeStatus,
     });
     activeArcadeBoard = createArcadeBoard(root, graph);
-    activeSession.insertAdjacentElement('afterend', activeArcadeBoard.element);
+    button.insertAdjacentElement('beforebegin', activeArcadeBoard.element);
     const renderer = createBoardRenderer(activeArcadeBoard.graph);
     activeEngine = createGameEngine({
       renderer,

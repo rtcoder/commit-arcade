@@ -157,6 +157,13 @@
     background-color: var(--contribution-default-bgColor-0) !important;
 }
 
+.commit-arcade-game-active svg:has(.ContributionCalendar-day),
+.commit-arcade-game-active table:has(.ContributionCalendar-day),
+.commit-arcade-game-active table:has([data-date][data-level]),
+.commit-arcade-game-active table:has([data-date][data-count]) {
+    display: none !important;
+}
+
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='player'],
 .commit-arcade-cell[data-commit-arcade-state='player'] {
     fill: var(--commit-arcade-player) !important;

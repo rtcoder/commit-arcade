@@ -72,7 +72,7 @@ describe('initializeCommitArcade', () => {
     expect(document.querySelector('.commit-arcade-button')).toBeNull();
   });
 
-  it('places controls and the arcade board below the contribution graph', () => {
+  it('replaces the graph area with the arcade board and keeps controls below it', () => {
     document.body.innerHTML = contributionGraphFixture();
 
     const controller = initializeCommitArcade(document);
@@ -92,8 +92,9 @@ describe('initializeCommitArcade', () => {
     const session = document.querySelector('.commit-arcade-session');
     const board = document.querySelector('.commit-arcade-board');
 
+    expect(board?.previousElementSibling).toBe(svg);
+    expect(playButton?.previousElementSibling).toBe(board);
     expect(session?.previousElementSibling).toBe(playButton);
-    expect(board?.previousElementSibling).toBe(session);
 
     controller.destroy();
   });
