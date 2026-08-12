@@ -1,21 +1,26 @@
-import { createBoardRenderer } from '../core/boardRenderer';
-import { createGameEngine, type GameEngine } from '../core/gameEngine';
-import { findContributionGraph } from '../core/githubContributionGraph';
-import { gameRegistry } from '../core/gameRegistry';
-import { createInputManager } from '../core/inputManager';
-import { loadSettings, saveSettings, type CommitArcadeSettings, type CommitArcadeSettingsStorage } from '../core/settings';
-import { restoreSnapshot, snapshotCells, type GraphSnapshot } from '../core/stateSnapshot';
-import { createBreakoutGame } from '../games/breakout/breakoutGame';
-import { createFlappyGame } from '../games/flappy/flappyGame';
-import { createFroggerGame } from '../games/frogger/froggerGame';
-import { createHelicopterGame } from '../games/helicopter/helicopterGame';
-import { createPongGame } from '../games/pong/pongGame';
-import { createRhythmGame } from '../games/rhythm/rhythmGame';
-import { createRunnerGame } from '../games/runner/runnerGame';
-import { createSnakeGame } from '../games/snake/snakeGame';
-import { createSpaceInvadersGame } from '../games/spaceInvaders/spaceInvadersGame';
-import { createTronGame } from '../games/tron/tronGame';
-import type { CommitArcadeGame, GameMetadata } from '../core/gameTypes';
+import {createBoardRenderer} from '../core/boardRenderer';
+import {createGameEngine, type GameEngine} from '../core/gameEngine';
+import {gameRegistry} from '../core/gameRegistry';
+import type {CommitArcadeGame, GameMetadata} from '../core/gameTypes';
+import {findContributionGraph} from '../core/githubContributionGraph';
+import {createInputManager} from '../core/inputManager';
+import {
+  type CommitArcadeSettings,
+  type CommitArcadeSettingsStorage,
+  loadSettings,
+  saveSettings,
+} from '../core/settings';
+import {type GraphSnapshot, restoreSnapshot, snapshotCells} from '../core/stateSnapshot';
+import {createBreakoutGame} from '../games/breakout/breakoutGame';
+import {createFlappyGame} from '../games/flappy/flappyGame';
+import {createFroggerGame} from '../games/frogger/froggerGame';
+import {createHelicopterGame} from '../games/helicopter/helicopterGame';
+import {createPongGame} from '../games/pong/pongGame';
+import {createRhythmGame} from '../games/rhythm/rhythmGame';
+import {createRunnerGame} from '../games/runner/runnerGame';
+import {createSnakeGame} from '../games/snake/snakeGame';
+import {createSpaceInvadersGame} from '../games/spaceInvaders/spaceInvadersGame';
+import {createTronGame} from '../games/tron/tronGame';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
 
@@ -61,9 +66,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   });
 
   installGraph();
-  lazyGraphObserver.observe(root.documentElement, { childList: true, subtree: true });
-  root.addEventListener('turbo:render', rescanGraph, { signal: abortController.signal });
-  view.addEventListener('popstate', rescanGraph, { signal: abortController.signal });
+  lazyGraphObserver.observe(root.documentElement, {childList: true, subtree: true});
+  root.addEventListener('turbo:render', rescanGraph, {signal: abortController.signal});
+  view.addEventListener('popstate', rescanGraph, {signal: abortController.signal});
 
   return {
     destroy(): void {
@@ -115,7 +120,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
           showMessage(root, graph.container, ownedElements, 'Paused. Commit Arcade restored the graph.');
         }
       },
-      { signal: abortController.signal },
+      {signal: abortController.signal},
     );
   }
 
@@ -141,7 +146,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeScore = 0;
     activeStatus = 'Playing';
     selectedGame = game.id;
-    persistSettings({ selectedGame });
+    persistSettings({selectedGame});
     activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
     graph.container.classList.add(ACTIVE_GRAPH_CLASS);
     activeSession = showSession(root, graph.container, ownedElements, {
@@ -170,7 +175,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       onScore: (score) => {
         activeScore = score;
         highScores[game.id] = Math.max(highScores[game.id] ?? 0, score);
-        persistSettings({ highScores: { ...highScores } });
+        persistSettings({highScores: {...highScores}});
         renderSession();
       },
     });

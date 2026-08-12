@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
+import type {CommitArcadeSettingsStorage} from '../core/settings';
 
-import { initializeCommitArcade } from './contentScript';
-import type { CommitArcadeSettingsStorage } from '../core/settings';
+import {initializeCommitArcade} from './contentScript';
 
 describe('initializeCommitArcade', () => {
   it('returns a controller with a cleanup method', () => {
@@ -142,7 +142,7 @@ describe('initializeCommitArcade', () => {
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
     document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
 
-    window.dispatchEvent(new KeyboardEvent('keydown', { cancelable: true, key: 'Escape' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', {cancelable: true, key: 'Escape'}));
 
     expect(document.querySelector('[data-commit-arcade-state]')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.textContent).toContain('Play');
@@ -242,7 +242,7 @@ describe('initializeCommitArcade', () => {
 
     expect(snake?.getAttribute('aria-label')).toBe('Start Snake. Classic panoramic Snake inside the contribution grid.');
 
-    snake?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' }));
+    snake?.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Enter'}));
 
     expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Snake');
 
@@ -301,14 +301,14 @@ describe('initializeCommitArcade', () => {
     document.body.innerHTML = contributionGraphFixture();
     const values: Record<string, unknown> = {
       commitArcadeSettings: {
-        highScores: { snake: 7 },
+        highScores: {snake: 7},
         selectedGame: 'snake',
         soundEnabled: false,
       },
     };
     const storage = createMemoryStorage(values);
 
-    const controller = initializeCommitArcade(document, { storage });
+    const controller = initializeCommitArcade(document, {storage});
     await flushPromises();
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
 
@@ -320,7 +320,7 @@ describe('initializeCommitArcade', () => {
     pickerItems[0]?.click();
 
     expect(document.querySelector<HTMLElement>('.commit-arcade-session')?.textContent).toContain('Best 7');
-    expect(values.commitArcadeSettings).toMatchObject({ selectedGame: 'snake' });
+    expect(values.commitArcadeSettings).toMatchObject({selectedGame: 'snake'});
 
     controller.destroy();
   });
@@ -337,7 +337,7 @@ describe('initializeCommitArcade', () => {
           name: 'Storage Runner',
           description: 'Scores immediately',
           status: 'playable',
-          start: ({ onScore, onGameOver }) => {
+          start: ({onScore, onGameOver}) => {
             onScore?.(9);
             onGameOver?.();
           },
@@ -356,7 +356,7 @@ describe('initializeCommitArcade', () => {
     await flushPromises();
 
     expect(values.commitArcadeSettings).toMatchObject({
-      highScores: { runner: 9 },
+      highScores: {runner: 9},
       selectedGame: 'runner',
     });
     expect(JSON.stringify(values.commitArcadeSettings)).not.toContain('2026-01-01');
@@ -375,7 +375,7 @@ describe('initializeCommitArcade', () => {
       },
     };
 
-    const controller = initializeCommitArcade(document, { storage });
+    const controller = initializeCommitArcade(document, {storage});
     await flushPromises();
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
     document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
@@ -403,7 +403,7 @@ describe('initializeCommitArcade', () => {
           name: 'Restartable Runner',
           description: 'Scores and ends immediately',
           status: 'playable',
-          start: ({ onScore, onGameOver }) => {
+          start: ({onScore, onGameOver}) => {
             starts += 1;
             onScore?.(starts === 1 ? 4 : 1);
             onGameOver?.();
@@ -451,7 +451,7 @@ describe('initializeCommitArcade', () => {
         </svg>
       </section>
     `;
-    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    Object.defineProperty(document, 'hidden', {configurable: true, value: true});
 
     const controller = initializeCommitArcade(document);
     document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
@@ -544,7 +544,7 @@ function contributionGraphFixture(): string {
 function createMemoryStorage(values: Record<string, unknown>): CommitArcadeSettingsStorage {
   return {
     async get(key) {
-      return { [key]: values[key] };
+      return {[key]: values[key]};
     },
     async set(patch) {
       Object.assign(values, patch);

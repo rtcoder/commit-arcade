@@ -1,4 +1,4 @@
-import type { BoardFrame, BoardSize } from './board';
+import type {BoardFrame, BoardSize} from './board';
 
 export type GameStatus = 'playable' | 'planned';
 
@@ -22,13 +22,18 @@ export interface GameContext {
 
 export interface BoardRenderer {
   render(frame: BoardFrame): void;
+
   clear(): void;
 }
 
 export interface CommitArcadeGame extends GameMetadata {
   start(context: GameContext): void;
+
   update(deltaMs: number): void;
+
   handleInput(input: GameInput): void;
+
   render(renderer: BoardRenderer): void;
+
   stop(): void;
 }

@@ -22,7 +22,7 @@ export type BoardFrame = PixelState[][];
 
 export function createEmptyFrame(size: BoardSize): BoardFrame {
   validateBoardSize(size);
-  return Array.from({ length: size.rows }, () => Array.from({ length: size.columns }, () => 'empty'));
+  return Array.from({length: size.rows}, () => Array.from({length: size.columns}, () => 'empty'));
 }
 
 export function getCellIndex(size: BoardSize, coordinate: BoardCoordinate): number {

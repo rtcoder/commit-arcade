@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardCoordinate, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardCoordinate, type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface TrafficCar extends BoardCoordinate {
   direction: -1 | 1;
@@ -15,8 +15,8 @@ const DEFAULT_TRAFFIC_STEP_MS = 320;
 
 export function createFroggerGame(options: FroggerOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
-  let player: BoardCoordinate = { row: 0, column: 0 };
+  let size: BoardSize = {rows: 1, columns: 1};
+  let player: BoardCoordinate = {row: 0, column: 0};
   let cars: TrafficCar[] = [];
   let trafficElapsedMs = 0;
   let score = 0;
@@ -30,8 +30,8 @@ export function createFroggerGame(options: FroggerOptions = {}): CommitArcadeGam
     start(nextContext): void {
       context = nextContext;
       size = nextContext.size;
-      player = options.initialPlayer !== undefined ? { ...options.initialPlayer } : startPosition();
-      cars = options.initialCars?.map((car) => ({ ...car })) ?? createDefaultCars();
+      player = options.initialPlayer !== undefined ? {...options.initialPlayer} : startPosition();
+      cars = options.initialCars?.map((car) => ({...car})) ?? createDefaultCars();
       trafficElapsedMs = 0;
       score = 0;
       stopped = false;
@@ -45,7 +45,7 @@ export function createFroggerGame(options: FroggerOptions = {}): CommitArcadeGam
       const stepMs = Math.max(1, options.trafficStepMs ?? DEFAULT_TRAFFIC_STEP_MS);
       while (trafficElapsedMs >= stepMs && !stopped) {
         trafficElapsedMs -= stepMs;
-        cars = cars.map((car) => ({ ...car, column: wrapColumn(car.column + car.direction) }));
+        cars = cars.map((car) => ({...car, column: wrapColumn(car.column + car.direction)}));
         checkCollision();
       }
     },
@@ -86,19 +86,19 @@ export function createFroggerGame(options: FroggerOptions = {}): CommitArcadeGam
       case 'ArrowUp':
       case 'w':
       case 'W':
-        return { row: clamp(player.row - 1, 0, size.rows - 1), column: player.column };
+        return {row: clamp(player.row - 1, 0, size.rows - 1), column: player.column};
       case 'ArrowDown':
       case 's':
       case 'S':
-        return { row: clamp(player.row + 1, 0, size.rows - 1), column: player.column };
+        return {row: clamp(player.row + 1, 0, size.rows - 1), column: player.column};
       case 'ArrowLeft':
       case 'a':
       case 'A':
-        return { row: player.row, column: clamp(player.column - 1, 0, size.columns - 1) };
+        return {row: player.row, column: clamp(player.column - 1, 0, size.columns - 1)};
       case 'ArrowRight':
       case 'd':
       case 'D':
-        return { row: player.row, column: clamp(player.column + 1, 0, size.columns - 1) };
+        return {row: player.row, column: clamp(player.column + 1, 0, size.columns - 1)};
       default:
         return null;
     }
@@ -117,14 +117,14 @@ export function createFroggerGame(options: FroggerOptions = {}): CommitArcadeGam
       const direction: -1 | 1 = row % 2 === 0 ? -1 : 1;
       const spacing = row % 2 === 0 ? 5 : 4;
       for (let column = row % spacing; column < size.columns; column += spacing) {
-        result.push({ row, column, direction });
+        result.push({row, column, direction});
       }
     }
     return result;
   }
 
   function startPosition(): BoardCoordinate {
-    return { row: Math.max(0, size.rows - 1), column: Math.floor(size.columns / 2) };
+    return {row: Math.max(0, size.rows - 1), column: Math.floor(size.columns / 2)};
   }
 
   function wrapColumn(column: number): number {

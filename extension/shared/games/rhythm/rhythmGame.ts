@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface RhythmNote {
   lane: number;
@@ -19,7 +19,7 @@ const DEFAULT_SPAWN_MS = 800;
 
 export function createRhythmGame(options: RhythmOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let notes: RhythmNote[] = [];
   let spawnElapsedMs = 0;
   let randomState = normalizeSeed(options.seed ?? 1);
@@ -34,7 +34,7 @@ export function createRhythmGame(options: RhythmOptions = {}): CommitArcadeGame 
     start(nextContext): void {
       context = nextContext;
       size = nextContext.size;
-      notes = options.initialNotes?.map((note) => ({ ...note })) ?? [{ lane: 0, row: 0 }];
+      notes = options.initialNotes?.map((note) => ({...note})) ?? [{lane: 0, row: 0}];
       spawnElapsedMs = 0;
       randomState = normalizeSeed(options.seed ?? 1);
       score = 0;
@@ -46,7 +46,7 @@ export function createRhythmGame(options: RhythmOptions = {}): CommitArcadeGame 
       }
       const safeDeltaMs = Math.max(0, deltaMs);
       const travel = (noteSpeed() * safeDeltaMs) / 1000;
-      notes = notes.map((note) => ({ ...note, row: note.row + travel }));
+      notes = notes.map((note) => ({...note, row: note.row + travel}));
       if (notes.some((note) => note.row > hitRow() + 0.5)) {
         stopped = true;
         context?.onGameOver?.();
@@ -56,7 +56,7 @@ export function createRhythmGame(options: RhythmOptions = {}): CommitArcadeGame 
       const spawnMs = Math.max(1, options.spawnMs ?? DEFAULT_SPAWN_MS);
       while (spawnElapsedMs >= spawnMs) {
         spawnElapsedMs -= spawnMs;
-        notes.push({ lane: nextRandomInt() % LANE_COUNT, row: 0 });
+        notes.push({lane: nextRandomInt() % LANE_COUNT, row: 0});
       }
     },
     handleInput(input: GameInput): void {

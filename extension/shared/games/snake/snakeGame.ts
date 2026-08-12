@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardCoordinate, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardCoordinate, type BoardSize, createEmptyFrame} from '../../core/board';
+import type {CommitArcadeGame, GameContext} from '../../core/gameTypes';
 
 interface SnakeOptions {
   foodSequence?: BoardCoordinate[];
@@ -13,11 +13,11 @@ const STEP_MS = 220;
 
 export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let snake: BoardCoordinate[] = [];
-  let direction: BoardCoordinate = { row: 0, column: 1 };
+  let direction: BoardCoordinate = {row: 0, column: 1};
   let queuedDirection: BoardCoordinate | null = null;
-  let food: BoardCoordinate = { row: 0, column: 0 };
+  let food: BoardCoordinate = {row: 0, column: 0};
   let foodSequenceIndex = 0;
   let score = 0;
   let stopped = false;
@@ -31,8 +31,11 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
     start(nextContext): void {
       context = nextContext;
       size = nextContext.size;
-      snake = options.initialSnake?.map((segment) => ({ ...segment })) ?? [{ row: Math.floor(size.rows / 2), column: Math.min(2, size.columns - 1) }];
-      direction = options.initialDirection ?? { row: 0, column: 1 };
+      snake = options.initialSnake?.map((segment) => ({...segment})) ?? [{
+        row: Math.floor(size.rows / 2),
+        column: Math.min(2, size.columns - 1),
+      }];
+      direction = options.initialDirection ?? {row: 0, column: 1};
       queuedDirection = null;
       foodSequenceIndex = 0;
       food = options.initialFood ?? nextFood();
@@ -78,7 +81,7 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
       queuedDirection = null;
     }
     const head = snake[0]!;
-    const next = { row: head.row + direction.row, column: head.column + direction.column };
+    const next = {row: head.row + direction.row, column: head.column + direction.column};
     if (isOutOfBounds(next) || snake.some((segment) => segment.row === next.row && segment.column === next.column)) {
       stopped = true;
       context?.onGameOver?.();
@@ -99,23 +102,23 @@ export function createSnakeGame(options: SnakeOptions = {}): CommitArcadeGame {
       const candidate = options.foodSequence![foodSequenceIndex]!;
       foodSequenceIndex += 1;
       if (!isOnSnake(candidate) && !isOutOfBounds(candidate)) {
-        return { ...candidate };
+        return {...candidate};
       }
     }
     const availableCoordinates: BoardCoordinate[] = [];
     for (let row = 0; row < size.rows; row += 1) {
       for (let column = 0; column < size.columns; column += 1) {
-        if (!isOnSnake({ row, column })) {
-          availableCoordinates.push({ row, column });
+        if (!isOnSnake({row, column})) {
+          availableCoordinates.push({row, column});
         }
       }
     }
     if (availableCoordinates.length > 0) {
       const random = options.random ?? Math.random;
       const index = Math.min(Math.floor(random() * availableCoordinates.length), availableCoordinates.length - 1);
-      return { ...availableCoordinates[index]! };
+      return {...availableCoordinates[index]!};
     }
-    return { row: 0, column: 0 };
+    return {row: 0, column: 0};
   }
 
   function isOutOfBounds(coordinate: BoardCoordinate): boolean {
@@ -136,19 +139,19 @@ function directionForKey(key: string): BoardCoordinate | null {
     case 'ArrowUp':
     case 'w':
     case 'W':
-      return { row: -1, column: 0 };
+      return {row: -1, column: 0};
     case 'ArrowDown':
     case 's':
     case 'S':
-      return { row: 1, column: 0 };
+      return {row: 1, column: 0};
     case 'ArrowLeft':
     case 'a':
     case 'A':
-      return { row: 0, column: -1 };
+      return {row: 0, column: -1};
     case 'ArrowRight':
     case 'd':
     case 'D':
-      return { row: 0, column: 1 };
+      return {row: 0, column: 1};
     default:
       return null;
   }

@@ -1,10 +1,10 @@
-import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
+import {mkdir, mkdtemp, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { validateExtensionPackage } from './validate-extension-package.mjs';
+import {validateExtensionPackage} from './validate-extension-package.mjs';
 
 describe('validateExtensionPackage', () => {
   it('accepts a complete Chrome build directory', async () => {
@@ -56,7 +56,7 @@ describe('validateExtensionPackage', () => {
       manifestVersion: 2,
       target: 'firefox',
     });
-    await mkdir(path.join(buildDir, 'node_modules'), { recursive: true });
+    await mkdir(path.join(buildDir, 'node_modules'), {recursive: true});
 
     await expect(validateExtensionPackage('firefox', buildDir)).rejects.toThrow('Forbidden package entry node_modules');
   });
@@ -70,7 +70,7 @@ interface BuildDirOptions {
 
 async function createBuildDir(options: BuildDirOptions): Promise<string> {
   const buildDir = await mkdtemp(path.join(os.tmpdir(), `commit-arcade-${options.target}-`));
-  await mkdir(path.join(buildDir, 'assets', 'icons'), { recursive: true });
+  await mkdir(path.join(buildDir, 'assets', 'icons'), {recursive: true});
   const manifest = {
     manifest_version: options.manifestVersion,
     name: 'Commit Arcade',

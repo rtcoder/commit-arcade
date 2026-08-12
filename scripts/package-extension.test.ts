@@ -1,10 +1,10 @@
-import { mkdtemp, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, stat, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { createExtensionArchive } from './package-extension.mjs';
+import {createExtensionArchive} from './package-extension.mjs';
 
 describe('createExtensionArchive', () => {
   it('creates a deterministic versioned archive without source maps', async () => {
@@ -60,7 +60,7 @@ describe('createExtensionArchive', () => {
 });
 
 async function createBuild(buildDir: string): Promise<void> {
-  await mkdir(path.join(buildDir, 'assets', 'icons'), { recursive: true });
+  await mkdir(path.join(buildDir, 'assets', 'icons'), {recursive: true});
   await writeFile(path.join(buildDir, 'manifest.json'), '{"manifest_version":3}\n');
   await writeFile(path.join(buildDir, 'contentScript.js'), '(() => {})();\n');
   await writeFile(path.join(buildDir, 'contentScript.js.map'), '{}\n');

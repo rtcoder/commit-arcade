@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface RunnerOptions {
   obstacleColumns?: number[];
@@ -16,7 +16,7 @@ const OBSTACLE_SPACING_RANGE = 6;
 
 export function createRunnerGame(options: RunnerOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let playerColumn = 0;
   let playerRow = 0;
   let velocity = 0;

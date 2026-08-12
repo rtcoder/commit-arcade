@@ -1,10 +1,10 @@
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { createAmoSourceArchive } from './package-amo-source.mjs';
+import {createAmoSourceArchive} from './package-amo-source.mjs';
 
 describe('createAmoSourceArchive', () => {
   it('creates a deterministic Firefox source package with lockfile and reviewer instructions', async () => {
@@ -12,9 +12,9 @@ describe('createAmoSourceArchive', () => {
     await createSourceTree(root);
     const distDir = path.join(root, 'dist');
 
-    const first = await createAmoSourceArchive({ distDir, root, version: 'v1.0.0' });
+    const first = await createAmoSourceArchive({distDir, root, version: 'v1.0.0'});
     const firstBytes = await readFile(first.archivePath);
-    const second = await createAmoSourceArchive({ distDir, root, version: 'v1.0.0' });
+    const second = await createAmoSourceArchive({distDir, root, version: 'v1.0.0'});
     const secondBytes = await readFile(second.archivePath);
 
     expect(path.basename(first.archivePath)).toBe('commit-arcade-firefox-source-v1.0.0.zip');
@@ -39,14 +39,14 @@ describe('createAmoSourceArchive', () => {
 });
 
 async function createSourceTree(root: string): Promise<void> {
-  await mkdir(path.join(root, 'docs', 'qa'), { recursive: true });
-  await mkdir(path.join(root, 'scripts'), { recursive: true });
-  await mkdir(path.join(root, 'extension', 'shared', 'src'), { recursive: true });
-  await mkdir(path.join(root, 'extension', 'firefox'), { recursive: true });
-  await mkdir(path.join(root, 'extension', 'firefox', 'build'), { recursive: true });
-  await mkdir(path.join(root, 'node_modules', 'ignored'), { recursive: true });
-  await mkdir(path.join(root, '.ytrack'), { recursive: true });
-  await mkdir(path.join(root, 'dist'), { recursive: true });
+  await mkdir(path.join(root, 'docs', 'qa'), {recursive: true});
+  await mkdir(path.join(root, 'scripts'), {recursive: true});
+  await mkdir(path.join(root, 'extension', 'shared', 'src'), {recursive: true});
+  await mkdir(path.join(root, 'extension', 'firefox'), {recursive: true});
+  await mkdir(path.join(root, 'extension', 'firefox', 'build'), {recursive: true});
+  await mkdir(path.join(root, 'node_modules', 'ignored'), {recursive: true});
+  await mkdir(path.join(root, '.ytrack'), {recursive: true});
+  await mkdir(path.join(root, 'dist'), {recursive: true});
   await writeFile(path.join(root, 'README.md'), '# Commit Arcade\n');
   await writeFile(path.join(root, 'package.json'), '{}\n');
   await writeFile(path.join(root, 'package-lock.json'), '{}\n');

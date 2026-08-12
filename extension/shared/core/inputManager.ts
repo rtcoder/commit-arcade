@@ -1,8 +1,10 @@
-import type { GameInput } from './gameTypes';
+import type {GameInput} from './gameTypes';
 
 export interface InputManager {
   activate(usedKeys: ReadonlySet<string>, sink: (input: GameInput) => void): void;
+
   deactivate(): void;
+
   destroy(): void;
 }
 
@@ -14,8 +16,8 @@ export function createInputManager(target: EventTarget = window): InputManager {
   const handleKeyDown = (event: Event): void => handleKeyboardEvent(event, 'down');
   const handleKeyUp = (event: Event): void => handleKeyboardEvent(event, 'up');
 
-  target.addEventListener('keydown', handleKeyDown, { signal: abortController.signal });
-  target.addEventListener('keyup', handleKeyUp, { signal: abortController.signal });
+  target.addEventListener('keydown', handleKeyDown, {signal: abortController.signal});
+  target.addEventListener('keyup', handleKeyUp, {signal: abortController.signal});
 
   return {
     activate(usedKeys, sink): void {
@@ -38,6 +40,6 @@ export function createInputManager(target: EventTarget = window): InputManager {
       return;
     }
     event.preventDefault();
-    activeSink({ key: event.key, type });
+    activeSink({key: event.key, type});
   }
 }

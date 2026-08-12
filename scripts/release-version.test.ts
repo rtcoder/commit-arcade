@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const ROOT = process.cwd();
 const RELEASE_VERSION = '1.0.0';

@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardCoordinate, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardCoordinate, type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface TronOptions {
   initialDirection?: BoardCoordinate;
@@ -12,9 +12,9 @@ const DEFAULT_STEP_MS = 160;
 
 export function createTronGame(options: TronOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
-  let player: BoardCoordinate = { row: 0, column: 0 };
-  let direction: BoardCoordinate = { row: 0, column: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
+  let player: BoardCoordinate = {row: 0, column: 0};
+  let direction: BoardCoordinate = {row: 0, column: 1};
   let queuedDirection: BoardCoordinate | null = null;
   let trail: BoardCoordinate[] = [];
   let elapsedMs = 0;
@@ -29,10 +29,13 @@ export function createTronGame(options: TronOptions = {}): CommitArcadeGame {
     start(nextContext): void {
       context = nextContext;
       size = nextContext.size;
-      player = options.initialPlayer !== undefined ? { ...options.initialPlayer } : { row: Math.floor(size.rows / 2), column: 1 };
-      direction = options.initialDirection ?? { row: 0, column: 1 };
+      player = options.initialPlayer !== undefined ? {...options.initialPlayer} : {
+        row: Math.floor(size.rows / 2),
+        column: 1,
+      };
+      direction = options.initialDirection ?? {row: 0, column: 1};
       queuedDirection = null;
-      trail = options.initialTrail?.map((segment) => ({ ...segment })) ?? [player];
+      trail = options.initialTrail?.map((segment) => ({...segment})) ?? [player];
       elapsedMs = 0;
       score = 0;
       stopped = false;
@@ -79,7 +82,7 @@ export function createTronGame(options: TronOptions = {}): CommitArcadeGame {
       direction = queuedDirection;
       queuedDirection = null;
     }
-    const next = { row: player.row + direction.row, column: player.column + direction.column };
+    const next = {row: player.row + direction.row, column: player.column + direction.column};
     if (!isInBounds(next) || trail.some((segment) => sameCoordinate(segment, next))) {
       stopped = true;
       context?.onGameOver?.();
@@ -101,19 +104,19 @@ function directionForKey(key: string): BoardCoordinate | null {
     case 'ArrowUp':
     case 'w':
     case 'W':
-      return { row: -1, column: 0 };
+      return {row: -1, column: 0};
     case 'ArrowDown':
     case 's':
     case 'S':
-      return { row: 1, column: 0 };
+      return {row: 1, column: 0};
     case 'ArrowLeft':
     case 'a':
     case 'A':
-      return { row: 0, column: -1 };
+      return {row: 0, column: -1};
     case 'ArrowRight':
     case 'd':
     case 'D':
-      return { row: 0, column: 1 };
+      return {row: 0, column: 1};
     default:
       return null;
   }

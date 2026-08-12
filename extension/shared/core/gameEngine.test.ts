@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { createGameEngine } from './gameEngine';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from './gameTypes';
+import {createGameEngine} from './gameEngine';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from './gameTypes';
 
 describe('createGameEngine', () => {
   it('starts a game, renders through the renderer, and cleans up after game errors', () => {
@@ -27,7 +27,7 @@ describe('createGameEngine', () => {
     };
     const engine = createGameEngine({
       renderer,
-      size: { rows: 1, columns: 1 },
+      size: {rows: 1, columns: 1},
       onError: (error) => calls.push(error.message),
     });
 

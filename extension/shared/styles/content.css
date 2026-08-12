@@ -1,177 +1,177 @@
 :root {
-  --commit-arcade-empty: var(--color-calendar-graph-day-bg, #ebedf0);
-  --commit-arcade-dim: var(--color-fg-muted, #57606a);
-  --commit-arcade-player: #2da44e;
-  --commit-arcade-enemy: #cf222e;
-  --commit-arcade-accent: #0969da;
-  --commit-arcade-danger: #bc4c00;
+    --commit-arcade-empty: var(--color-calendar-graph-day-bg, #ebedf0);
+    --commit-arcade-dim: var(--color-fg-muted, #57606a);
+    --commit-arcade-player: #2da44e;
+    --commit-arcade-enemy: #cf222e;
+    --commit-arcade-accent: #0969da;
+    --commit-arcade-danger: #bc4c00;
 }
 
 .commit-arcade-button {
-  align-items: center;
-  border: 1px solid var(--color-border-default, #d0d7de);
-  border-radius: 6px;
-  background: var(--color-btn-bg, #f6f8fa);
-  color: var(--color-fg-default, #24292f);
-  cursor: pointer;
-  display: inline-flex;
-  font: inherit;
-  gap: 0.35rem;
-  min-height: 28px;
-  padding: 3px 8px;
+    align-items: center;
+    border: 1px solid var(--color-border-default, #d0d7de);
+    border-radius: 6px;
+    background: var(--color-btn-bg, #f6f8fa);
+    color: var(--color-fg-default, #24292f);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    gap: 0.35rem;
+    min-height: 28px;
+    padding: 3px 8px;
 }
 
 .commit-arcade-button:focus-visible {
-  outline: 2px solid var(--commit-arcade-accent);
-  outline-offset: 2px;
+    outline: 2px solid var(--commit-arcade-accent);
+    outline-offset: 2px;
 }
 
 .commit-arcade-picker {
-  background: var(--color-canvas-overlay, #ffffff);
-  border: 1px solid var(--color-border-default, #d0d7de);
-  border-radius: 6px;
-  box-shadow: var(--color-shadow-large, 0 8px 24px rgba(140, 149, 159, 0.2));
-  color: var(--color-fg-default, #24292f);
-  display: grid;
-  gap: 2px;
-  margin-top: 6px;
-  max-width: min(220px, calc(100vw - 32px));
-  padding: 6px;
-  position: absolute;
-  z-index: 20;
+    background: var(--color-canvas-overlay, #ffffff);
+    border: 1px solid var(--color-border-default, #d0d7de);
+    border-radius: 6px;
+    box-shadow: var(--color-shadow-large, 0 8px 24px rgba(140, 149, 159, 0.2));
+    color: var(--color-fg-default, #24292f);
+    display: grid;
+    gap: 2px;
+    margin-top: 6px;
+    max-width: min(220px, calc(100vw - 32px));
+    padding: 6px;
+    position: absolute;
+    z-index: 20;
 }
 
 .commit-arcade-picker-item {
-  background: transparent;
-  border: 0;
-  border-radius: 4px;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  padding: 5px 8px;
-  text-align: left;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: 5px 8px;
+    text-align: left;
 }
 
 .commit-arcade-picker-item:hover:not(:disabled),
 .commit-arcade-picker-item:focus-visible {
-  background: var(--color-accent-subtle, #ddf4ff);
+    background: var(--color-accent-subtle, #ddf4ff);
 }
 
 .commit-arcade-picker-item:focus-visible {
-  outline: 2px solid var(--commit-arcade-accent);
-  outline-offset: -2px;
+    outline: 2px solid var(--commit-arcade-accent);
+    outline-offset: -2px;
 }
 
 .commit-arcade-picker-item:disabled {
-  color: var(--commit-arcade-dim);
-  cursor: not-allowed;
+    color: var(--commit-arcade-dim);
+    cursor: not-allowed;
 }
 
 .commit-arcade-message {
-  background: var(--color-attention-subtle, #fff8c5);
-  border: 1px solid var(--color-attention-muted, #d4a72c);
-  border-radius: 6px;
-  color: var(--color-fg-default, #24292f);
-  display: inline-block;
-  font: inherit;
-  margin: 0 0 6px;
-  padding: 4px 8px;
+    background: var(--color-attention-subtle, #fff8c5);
+    border: 1px solid var(--color-attention-muted, #d4a72c);
+    border-radius: 6px;
+    color: var(--color-fg-default, #24292f);
+    display: inline-block;
+    font: inherit;
+    margin: 0 0 6px;
+    padding: 4px 8px;
 }
 
 .commit-arcade-session {
-  align-items: center;
-  background: var(--color-canvas-overlay, #ffffff);
-  border: 1px solid var(--color-border-default, #d0d7de);
-  border-radius: 6px;
-  color: var(--color-fg-default, #24292f);
-  display: flex;
-  flex-wrap: wrap;
-  font: inherit;
-  gap: 6px;
-  margin: 0 0 6px;
-  max-width: min(100%, 640px);
-  padding: 4px 6px;
+    align-items: center;
+    background: var(--color-canvas-overlay, #ffffff);
+    border: 1px solid var(--color-border-default, #d0d7de);
+    border-radius: 6px;
+    color: var(--color-fg-default, #24292f);
+    display: flex;
+    flex-wrap: wrap;
+    font: inherit;
+    gap: 6px;
+    margin: 0 0 6px;
+    max-width: min(100%, 640px);
+    padding: 4px 6px;
 }
 
 .commit-arcade-session-title {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .commit-arcade-controls-help {
-  color: var(--commit-arcade-dim);
+    color: var(--commit-arcade-dim);
 }
 
 .commit-arcade-session-button {
-  background: var(--color-btn-bg, #f6f8fa);
-  border: 1px solid var(--color-border-default, #d0d7de);
-  border-radius: 6px;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  min-height: 26px;
-  padding: 2px 7px;
+    background: var(--color-btn-bg, #f6f8fa);
+    border: 1px solid var(--color-border-default, #d0d7de);
+    border-radius: 6px;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    min-height: 26px;
+    padding: 2px 7px;
 }
 
 .commit-arcade-session-button:hover,
 .commit-arcade-session-button:focus-visible {
-  background: var(--color-accent-subtle, #ddf4ff);
+    background: var(--color-accent-subtle, #ddf4ff);
 }
 
 .commit-arcade-session-button:focus-visible {
-  outline: 2px solid var(--commit-arcade-accent);
-  outline-offset: 2px;
+    outline: 2px solid var(--commit-arcade-accent);
+    outline-offset: 2px;
 }
 
 @media (max-width: 480px) {
-  .commit-arcade-picker {
-    position: static;
-  }
+    .commit-arcade-picker {
+        position: static;
+    }
 
-  .commit-arcade-session {
-    align-items: stretch;
-    display: grid;
-    max-width: 100%;
-  }
+    .commit-arcade-session {
+        align-items: stretch;
+        display: grid;
+        max-width: 100%;
+    }
 
-  .commit-arcade-session-button {
-    justify-self: start;
-  }
+    .commit-arcade-session-button {
+        justify-self: start;
+    }
 }
 
 .commit-arcade-game-active .ContributionCalendar-day,
 .commit-arcade-game-active rect[data-date],
 .commit-arcade-game-active [data-date][data-level],
 .commit-arcade-game-active [data-date][data-count] {
-  fill: var(--contribution-default-bgColor-0) !important;
-  background-color: var(--contribution-default-bgColor-0) !important;
+    fill: var(--contribution-default-bgColor-0) !important;
+    background-color: var(--contribution-default-bgColor-0) !important;
 }
 
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='player'],
 .commit-arcade-cell[data-commit-arcade-state='player'] {
-  fill: var(--commit-arcade-player) !important;
-  background-color: var(--commit-arcade-player) !important;
+    fill: var(--commit-arcade-player) !important;
+    background-color: var(--commit-arcade-player) !important;
 }
 
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='enemy'],
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='obstacle'],
 .commit-arcade-cell[data-commit-arcade-state='enemy'],
 .commit-arcade-cell[data-commit-arcade-state='obstacle'] {
-  fill: var(--commit-arcade-enemy) !important;
-  background-color: var(--commit-arcade-enemy) !important;
+    fill: var(--commit-arcade-enemy) !important;
+    background-color: var(--commit-arcade-enemy) !important;
 }
 
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='bonus'],
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='accent'],
 .commit-arcade-cell[data-commit-arcade-state='bonus'],
 .commit-arcade-cell[data-commit-arcade-state='accent'] {
-  fill: var(--commit-arcade-accent) !important;
-  background-color: var(--commit-arcade-accent) !important;
+    fill: var(--commit-arcade-accent) !important;
+    background-color: var(--commit-arcade-accent) !important;
 }
 
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='projectile'],
 .commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='trail'],
 .commit-arcade-cell[data-commit-arcade-state='projectile'],
 .commit-arcade-cell[data-commit-arcade-state='trail'] {
-  fill: var(--commit-arcade-danger) !important;
-  background-color: var(--commit-arcade-danger) !important;
+    fill: var(--commit-arcade-danger) !important;
+    background-color: var(--commit-arcade-danger) !important;
 }

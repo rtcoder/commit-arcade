@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface TunnelColumn {
   column: number;
@@ -22,7 +22,7 @@ const SPAWN_SPACING = 4;
 
 export function createHelicopterGame(options: HelicopterOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let playerRow = 0;
   let velocity = 0;
   let thrusting = false;
@@ -43,7 +43,7 @@ export function createHelicopterGame(options: HelicopterOptions = {}): CommitArc
       velocity = 0;
       thrusting = false;
       randomState = normalizeSeed(options.seed ?? 1);
-      tunnel = options.initialTunnel?.map((column) => ({ ...column })) ?? initialTunnel();
+      tunnel = options.initialTunnel?.map((column) => ({...column})) ?? initialTunnel();
       score = 0;
       stopped = false;
       checkCollision();
@@ -55,7 +55,7 @@ export function createHelicopterGame(options: HelicopterOptions = {}): CommitArc
       const seconds = Math.max(0, deltaMs) / 1000;
       velocity += (thrusting ? THRUST_ROWS_PER_SECOND : GRAVITY_ROWS_PER_SECOND) * seconds;
       playerRow = clamp(playerRow + velocity * seconds, 0, size.rows - 1);
-      tunnel = tunnel.map((column) => ({ ...column, column: column.column - SCROLL_COLUMNS_PER_SECOND * seconds }));
+      tunnel = tunnel.map((column) => ({...column, column: column.column - SCROLL_COLUMNS_PER_SECOND * seconds}));
       for (const column of tunnel) {
         if (column.scored !== true && column.column < PLAYER_COLUMN) {
           column.scored = true;
@@ -105,14 +105,14 @@ export function createHelicopterGame(options: HelicopterOptions = {}): CommitArc
   function spawnTunnel(): void {
     const rightmost = tunnel.reduce((max, column) => Math.max(max, column.column), -Infinity);
     if (rightmost <= size.columns - SPAWN_SPACING) {
-      tunnel.push({ column: size.columns - 1, gapStart: nextGapStart() });
+      tunnel.push({column: size.columns - 1, gapStart: nextGapStart()});
     }
   }
 
   function initialTunnel(): TunnelColumn[] {
     const result: TunnelColumn[] = [];
     for (let column = Math.max(3, Math.floor(size.columns / 2)); column < size.columns; column += SPAWN_SPACING) {
-      result.push({ column, gapStart: nextGapStart() });
+      result.push({column, gapStart: nextGapStart()});
     }
     return result;
   }

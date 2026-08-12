@@ -1,4 +1,4 @@
-import type { GameMetadata } from './gameTypes';
+import type {GameMetadata} from './gameTypes';
 
 export const gameRegistry: readonly GameMetadata[] = [
   {

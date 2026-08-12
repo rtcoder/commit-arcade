@@ -1,12 +1,12 @@
-import { readFile } from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const ROOT = process.cwd();
 const MANIFESTS = [
-  { browser: 'chrome', manifestPath: 'extension/chrome/manifest.json' },
-  { browser: 'firefox', manifestPath: 'extension/firefox/manifest.json' },
+  {browser: 'chrome', manifestPath: 'extension/chrome/manifest.json'},
+  {browser: 'firefox', manifestPath: 'extension/firefox/manifest.json'},
 ] as const;
 const RUNTIME_FILES = [
   'extension/shared/src/contentScript.ts',
@@ -16,7 +16,7 @@ const RUNTIME_FILES = [
 
 describe('extension store compliance', () => {
   it('uses GitHub-only content script scope with no broad permissions', async () => {
-    for (const { manifestPath } of MANIFESTS) {
+    for (const {manifestPath} of MANIFESTS) {
       const manifest = await readJson(manifestPath);
 
       expect(manifest.permissions ?? []).toEqual([]);
@@ -27,11 +27,11 @@ describe('extension store compliance', () => {
   });
 
   it('declares CSP that allows only packaged extension code', async () => {
-    for (const { browser, manifestPath } of MANIFESTS) {
+    for (const {browser, manifestPath} of MANIFESTS) {
       const manifest = await readJson(manifestPath);
       const csp = browser === 'chrome' ? manifest.content_security_policy?.extension_pages : manifest.content_security_policy;
 
-      expect(csp).toBe("script-src 'self'; object-src 'self';");
+      expect(csp).toBe('script-src \'self\'; object-src \'self\';');
       expect(csp).not.toContain('unsafe-eval');
       expect(csp).not.toContain('http:');
       expect(csp).not.toContain('https:');

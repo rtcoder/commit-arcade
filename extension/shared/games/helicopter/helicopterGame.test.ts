@@ -1,14 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
+import {createTestRenderer} from '../../test/testRenderer';
 
-import { createHelicopterGame } from './helicopterGame';
-import { createTestRenderer } from '../../test/testRenderer';
+import {createHelicopterGame} from './helicopterGame';
 
 describe('createHelicopterGame', () => {
   it('renders the helicopter and tunnel walls on start', () => {
-    const game = createHelicopterGame({ initialTunnel: [{ column: 6, gapStart: 2 }] });
+    const game = createHelicopterGame({initialTunnel: [{column: 6, gapStart: 2}]});
     const renderer = createTestRenderer();
 
-    game.start({ size: { rows: 7, columns: 12 } });
+    game.start({size: {rows: 7, columns: 12}});
     game.render(renderer);
 
     expect(cellAt(renderer.lastFrame, 3, 1)).toBe('player');
@@ -17,13 +17,13 @@ describe('createHelicopterGame', () => {
   });
 
   it('rises while the thrust key is held', () => {
-    const game = createHelicopterGame({ initialRow: 4, initialTunnel: [] });
+    const game = createHelicopterGame({initialRow: 4, initialTunnel: []});
     const renderer = createTestRenderer();
 
-    game.start({ size: { rows: 7, columns: 12 } });
-    game.handleInput({ key: ' ', type: 'down' });
+    game.start({size: {rows: 7, columns: 12}});
+    game.handleInput({key: ' ', type: 'down'});
     game.update(300);
-    game.handleInput({ key: ' ', type: 'up' });
+    game.handleInput({key: ' ', type: 'up'});
     game.render(renderer);
 
     expect(cellAt(renderer.lastFrame, 2, 1)).toBe('player');
@@ -31,9 +31,9 @@ describe('createHelicopterGame', () => {
 
   it('reports score as the tunnel scrolls past the player', () => {
     const scores: number[] = [];
-    const game = createHelicopterGame({ initialTunnel: [{ column: 2, gapStart: 2 }] });
+    const game = createHelicopterGame({initialTunnel: [{column: 2, gapStart: 2}]});
 
-    game.start({ size: { rows: 7, columns: 12 }, onScore: (score) => scores.push(score) });
+    game.start({size: {rows: 7, columns: 12}, onScore: (score) => scores.push(score)});
     game.update(500);
 
     expect(scores).toEqual([1]);
@@ -41,9 +41,9 @@ describe('createHelicopterGame', () => {
 
   it('ends when the helicopter hits a tunnel wall', () => {
     let gameOver = false;
-    const game = createHelicopterGame({ initialRow: 0, initialTunnel: [{ column: 1, gapStart: 2 }] });
+    const game = createHelicopterGame({initialRow: 0, initialTunnel: [{column: 1, gapStart: 2}]});
 
-    game.start({ size: { rows: 7, columns: 12 }, onGameOver: () => (gameOver = true) });
+    game.start({size: {rows: 7, columns: 12}, onGameOver: () => (gameOver = true)});
     game.update(0);
 
     expect(gameOver).toBe(true);

@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext } from '../../core/gameTypes';
+import {type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext} from '../../core/gameTypes';
 
 interface FlappyOptions {
   gapSize?: number;
@@ -22,7 +22,7 @@ const BARRIER_SPACING = 8;
 
 export function createFlappyGame(options: FlappyOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let playerRow = 0;
   let velocity = 0;
   let barriers: Barrier[] = [];
@@ -52,7 +52,10 @@ export function createFlappyGame(options: FlappyOptions = {}): CommitArcadeGame 
       const seconds = Math.max(0, deltaMs) / 1000;
       playerRow = clamp(playerRow + velocity * seconds, 0, size.rows - 1);
       velocity += GRAVITY_ROWS_PER_SECOND * seconds;
-      barriers = barriers.map((barrier) => ({ ...barrier, column: barrier.column - BARRIER_SPEED_COLUMNS_PER_SECOND * seconds }));
+      barriers = barriers.map((barrier) => ({
+        ...barrier,
+        column: barrier.column - BARRIER_SPEED_COLUMNS_PER_SECOND * seconds,
+      }));
       for (const barrier of barriers) {
         if (!barrier.scored && barrier.column < PLAYER_COLUMN) {
           barrier.scored = true;

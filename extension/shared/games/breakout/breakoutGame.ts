@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardCoordinate, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardCoordinate, type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface BreakoutOptions {
   brickRows?: number;
@@ -15,11 +15,11 @@ const PADDLE_SPEED_COLUMNS_PER_SECOND = 12;
 
 export function createBreakoutGame(options: BreakoutOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let paddleColumn = 0;
   let paddleDirection = 0;
-  let ball: BoardCoordinate = { row: 0, column: 0 };
-  let velocity: BoardCoordinate = { row: 0, column: 0 };
+  let ball: BoardCoordinate = {row: 0, column: 0};
+  let velocity: BoardCoordinate = {row: 0, column: 0};
   let bricks = new Set<string>();
   let score = 0;
   let stopped = false;
@@ -34,8 +34,14 @@ export function createBreakoutGame(options: BreakoutOptions = {}): CommitArcadeG
       size = nextContext.size;
       paddleColumn = clamp(options.initialPaddleColumn ?? centeredPaddleColumn(), 0, maxPaddleColumn());
       paddleDirection = 0;
-      ball = options.initialBall !== undefined ? { ...options.initialBall } : { row: paddleRow() - 1, column: paddleColumn + 1 };
-      velocity = options.initialBallVelocity !== undefined ? { ...options.initialBallVelocity } : { row: BALL_SPEED_ROWS_PER_SECOND, column: BALL_SPEED_COLUMNS_PER_SECOND };
+      ball = options.initialBall !== undefined ? {...options.initialBall} : {
+        row: paddleRow() - 1,
+        column: paddleColumn + 1,
+      };
+      velocity = options.initialBallVelocity !== undefined ? {...options.initialBallVelocity} : {
+        row: BALL_SPEED_ROWS_PER_SECOND,
+        column: BALL_SPEED_COLUMNS_PER_SECOND,
+      };
       bricks = initialBricks();
       score = 0;
       stopped = false;
@@ -78,7 +84,7 @@ export function createBreakoutGame(options: BreakoutOptions = {}): CommitArcadeG
   };
 
   function moveBall(seconds: number): void {
-    ball = { row: ball.row + velocity.row * seconds, column: ball.column + velocity.column * seconds };
+    ball = {row: ball.row + velocity.row * seconds, column: ball.column + velocity.column * seconds};
     if (ball.column < 0) {
       ball.column = 0;
       velocity.column = Math.abs(velocity.column);
@@ -91,7 +97,10 @@ export function createBreakoutGame(options: BreakoutOptions = {}): CommitArcadeG
       ball.row = 0;
       velocity.row = Math.abs(velocity.row);
     }
-    const renderedBall = { row: clamp(Math.round(ball.row), 0, size.rows - 1), column: clamp(Math.round(ball.column), 0, size.columns - 1) };
+    const renderedBall = {
+      row: clamp(Math.round(ball.row), 0, size.rows - 1),
+      column: clamp(Math.round(ball.column), 0, size.columns - 1),
+    };
     const brickKey = coordinateKey(renderedBall);
     if (bricks.delete(brickKey)) {
       score += 1;
@@ -117,7 +126,7 @@ export function createBreakoutGame(options: BreakoutOptions = {}): CommitArcadeG
     const result = new Set<string>();
     for (let row = 0; row < brickRows(); row += 1) {
       for (let column = 0; column < size.columns; column += 1) {
-        result.add(coordinateKey({ row, column }));
+        result.add(coordinateKey({row, column}));
       }
     }
     return result;

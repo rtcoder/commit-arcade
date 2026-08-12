@@ -1,11 +1,15 @@
-import type { BoardRenderer, CommitArcadeGame, GameInput } from './gameTypes';
-import type { BoardSize } from './board';
+import type {BoardSize} from './board';
+import type {BoardRenderer, CommitArcadeGame, GameInput} from './gameTypes';
 
 export interface GameEngine {
   handleInput(input: GameInput): void;
+
   isRunning(): boolean;
+
   start(game: CommitArcadeGame): void;
+
   stop(): void;
+
   tick(deltaMs: number): void;
 }
 
@@ -34,11 +38,11 @@ export function createGameEngine(options: GameEngineOptions): GameEngine {
       }
       activeGame = game;
       running = true;
-      const context = { size: options.size };
+      const context = {size: options.size};
       game.start({
         ...context,
-        ...(options.onGameOver === undefined ? {} : { onGameOver: options.onGameOver }),
-        ...(options.onScore === undefined ? {} : { onScore: options.onScore }),
+        ...(options.onGameOver === undefined ? {} : {onGameOver: options.onGameOver}),
+        ...(options.onScore === undefined ? {} : {onScore: options.onScore}),
       });
     },
     stop(): void {

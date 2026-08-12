@@ -1,6 +1,6 @@
-import type { BoardCoordinate, BoardFrame, PixelState } from './board';
-import type { ContributionGraph } from './githubContributionGraph';
-import type { BoardRenderer } from './gameTypes';
+import type {BoardCoordinate, BoardFrame, PixelState} from './board';
+import type {BoardRenderer} from './gameTypes';
+import type {ContributionGraph} from './githubContributionGraph';
 
 const CELL_CLASS = 'commit-arcade-cell';
 
@@ -16,7 +16,7 @@ export function createBoardRenderer(graph: ContributionGraph): BoardRenderer {
           if (previousFrame?.[row]?.[column] === state) {
             continue;
           }
-          const element = cellsByCoordinate.get(coordinateKey({ row, column }));
+          const element = cellsByCoordinate.get(coordinateKey({row, column}));
           applyState(element, state);
         }
       }

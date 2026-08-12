@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { stampManifestVersion } from './build-extension.mjs';
+import {stampManifestVersion} from './build-extension.mjs';
 
 describe('build extension manifest metadata', () => {
   it('uses package.json as the release version source of truth', () => {

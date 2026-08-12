@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const ROOT = process.cwd();
 
@@ -20,8 +20,8 @@ async function readPngSize(filePath: string) {
 
 describe('Chrome Web Store assets', () => {
   it('provides required image assets at Chrome Web Store dimensions', async () => {
-    await expect(readPngSize('docs/store/chrome/icon-128.png')).resolves.toEqual({ width: 128, height: 128 });
-    await expect(readPngSize('docs/store/chrome/promo-small-440x280.png')).resolves.toEqual({ width: 440, height: 280 });
+    await expect(readPngSize('docs/store/chrome/icon-128.png')).resolves.toEqual({width: 128, height: 128});
+    await expect(readPngSize('docs/store/chrome/promo-small-440x280.png')).resolves.toEqual({width: 440, height: 280});
     await expect(readPngSize('docs/store/chrome/screenshot-runner-1280x800.png')).resolves.toEqual({
       width: 1280,
       height: 800,
@@ -74,13 +74,13 @@ describe('v1 public website content', () => {
 
 describe('theme and responsive QA assets', () => {
   it('provides reference captures for light, dark, dimmed and narrow layouts', async () => {
-    await expect(readPngSize('docs/qa/visual/theme-light-1280x800.png')).resolves.toEqual({ width: 1280, height: 800 });
-    await expect(readPngSize('docs/qa/visual/theme-dark-1280x800.png')).resolves.toEqual({ width: 1280, height: 800 });
+    await expect(readPngSize('docs/qa/visual/theme-light-1280x800.png')).resolves.toEqual({width: 1280, height: 800});
+    await expect(readPngSize('docs/qa/visual/theme-dark-1280x800.png')).resolves.toEqual({width: 1280, height: 800});
     await expect(readPngSize('docs/qa/visual/theme-dark-dimmed-1280x800.png')).resolves.toEqual({
       width: 1280,
       height: 800,
     });
-    await expect(readPngSize('docs/qa/visual/theme-narrow-390x844.png')).resolves.toEqual({ width: 390, height: 844 });
+    await expect(readPngSize('docs/qa/visual/theme-narrow-390x844.png')).resolves.toEqual({width: 390, height: 844});
   });
 
   it('keeps extension visual CSS scoped and keyboard focus visible', async () => {

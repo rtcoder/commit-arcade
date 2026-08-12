@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import path from 'node:path';
+import {describe, expect, it} from 'vitest';
 
-import { findContributionGraph } from './githubContributionGraph';
+import {findContributionGraph} from './githubContributionGraph';
 
 const ROOT = process.cwd();
 
@@ -27,7 +27,7 @@ describe('findContributionGraph', () => {
 
     const graph = findContributionGraph(document);
 
-    expect(graph?.size).toEqual({ rows: 2, columns: 2 });
+    expect(graph?.size).toEqual({rows: 2, columns: 2});
     expect(graph?.cells.map((cell) => [cell.coordinate.row, cell.coordinate.column, cell.intensity])).toEqual([
       [0, 0, 0],
       [0, 1, 1],
@@ -64,7 +64,7 @@ describe('findContributionGraph', () => {
 
     const graph = findContributionGraph(document);
 
-    expect(graph?.size).toEqual({ rows: 2, columns: 2 });
+    expect(graph?.size).toEqual({rows: 2, columns: 2});
     expect(graph?.cells).toHaveLength(4);
   });
 
@@ -88,7 +88,7 @@ describe('findContributionGraph', () => {
 
     const graph = findContributionGraph(document);
 
-    expect(graph?.size).toEqual({ rows: 2, columns: 2 });
+    expect(graph?.size).toEqual({rows: 2, columns: 2});
     expect(graph?.cells.map((cell) => [cell.coordinate.row, cell.coordinate.column, cell.intensity])).toEqual([
       [0, 0, 0],
       [0, 1, 1],
@@ -122,7 +122,7 @@ describe('findContributionGraph', () => {
 
     const graph = findContributionGraph(document);
 
-    expect(graph?.size).toEqual({ rows: 2, columns: 3 });
+    expect(graph?.size).toEqual({rows: 2, columns: 3});
     expect(graph?.cells.map((cell) => cell.intensity)).toEqual([0, 1, 2, 3, 4, 0]);
   });
 

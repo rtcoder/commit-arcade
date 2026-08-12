@@ -1,19 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { createBoardRenderer } from './boardRenderer';
-import type { ContributionGraph } from './githubContributionGraph';
+import {createBoardRenderer} from './boardRenderer';
+import type {ContributionGraph} from './githubContributionGraph';
 
 describe('createBoardRenderer', () => {
   it('updates only changed cells and clears stale extension-owned state', () => {
-    const cells = Array.from({ length: 4 }, (_, index) => {
+    const cells = Array.from({length: 4}, (_, index) => {
       const element = document.createElement('rect');
       return {
-        coordinate: { row: Math.floor(index / 2), column: index % 2 },
+        coordinate: {row: Math.floor(index / 2), column: index % 2},
         element,
         intensity: index,
       };
     });
-    const graph: ContributionGraph = { cells, container: document.createElement('section'), size: { rows: 2, columns: 2 } };
+    const graph: ContributionGraph = {cells, container: document.createElement('section'), size: {rows: 2, columns: 2}};
     const renderer = createBoardRenderer(graph);
 
     renderer.render([
@@ -36,11 +36,11 @@ describe('createBoardRenderer', () => {
     const secondWeekBottomCell = document.createElement('td');
     const lastWeekTopCell = document.createElement('td');
     const cells = [
-      { coordinate: { row: 0, column: 1 }, element: firstWeekTopCell, intensity: 0 },
-      { coordinate: { row: 1, column: 1 }, element: secondWeekBottomCell, intensity: 0 },
-      { coordinate: { row: 0, column: 2 }, element: lastWeekTopCell, intensity: 0 },
+      {coordinate: {row: 0, column: 1}, element: firstWeekTopCell, intensity: 0},
+      {coordinate: {row: 1, column: 1}, element: secondWeekBottomCell, intensity: 0},
+      {coordinate: {row: 0, column: 2}, element: lastWeekTopCell, intensity: 0},
     ];
-    const graph: ContributionGraph = { cells, container: document.createElement('section'), size: { rows: 2, columns: 3 } };
+    const graph: ContributionGraph = {cells, container: document.createElement('section'), size: {rows: 2, columns: 3}};
     const renderer = createBoardRenderer(graph);
 
     renderer.render([

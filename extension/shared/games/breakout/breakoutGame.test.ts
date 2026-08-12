@@ -1,14 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
+import {createTestRenderer} from '../../test/testRenderer';
 
-import { createBreakoutGame } from './breakoutGame';
-import { createTestRenderer } from '../../test/testRenderer';
+import {createBreakoutGame} from './breakoutGame';
 
 describe('createBreakoutGame', () => {
   it('renders bricks, paddle and ball on start', () => {
-    const game = createBreakoutGame({ initialBall: { row: 4, column: 6 }, initialPaddleColumn: 5 });
+    const game = createBreakoutGame({initialBall: {row: 4, column: 6}, initialPaddleColumn: 5});
     const renderer = createTestRenderer();
 
-    game.start({ size: { rows: 7, columns: 12 } });
+    game.start({size: {rows: 7, columns: 12}});
     game.render(renderer);
 
     expect(cellAt(renderer.lastFrame, 0, 0)).toBe('obstacle');
@@ -19,13 +19,13 @@ describe('createBreakoutGame', () => {
   });
 
   it('moves the paddle with horizontal keys', () => {
-    const game = createBreakoutGame({ initialPaddleColumn: 5 });
+    const game = createBreakoutGame({initialPaddleColumn: 5});
     const renderer = createTestRenderer();
 
-    game.start({ size: { rows: 7, columns: 12 } });
-    game.handleInput({ key: 'ArrowLeft', type: 'down' });
+    game.start({size: {rows: 7, columns: 12}});
+    game.handleInput({key: 'ArrowLeft', type: 'down'});
     game.update(200);
-    game.handleInput({ key: 'ArrowLeft', type: 'up' });
+    game.handleInput({key: 'ArrowLeft', type: 'up'});
     game.render(renderer);
 
     expect(cellAt(renderer.lastFrame, 6, 3)).toBe('player');
@@ -36,12 +36,12 @@ describe('createBreakoutGame', () => {
     const scores: number[] = [];
     const game = createBreakoutGame({
       brickRows: 1,
-      initialBall: { row: 2, column: 4 },
-      initialBallVelocity: { row: -5, column: 0 },
+      initialBall: {row: 2, column: 4},
+      initialBallVelocity: {row: -5, column: 0},
     });
     const renderer = createTestRenderer();
 
-    game.start({ size: { rows: 7, columns: 12 }, onScore: (score) => scores.push(score) });
+    game.start({size: {rows: 7, columns: 12}, onScore: (score) => scores.push(score)});
     game.update(400);
     game.render(renderer);
 
@@ -51,13 +51,13 @@ describe('createBreakoutGame', () => {
 
   it('bounces the ball off the bottom paddle', () => {
     const game = createBreakoutGame({
-      initialBall: { row: 5, column: 5 },
-      initialBallVelocity: { row: 5, column: 0 },
+      initialBall: {row: 5, column: 5},
+      initialBallVelocity: {row: 5, column: 0},
       initialPaddleColumn: 4,
     });
     const renderer = createTestRenderer();
 
-    game.start({ size: { rows: 7, columns: 12 } });
+    game.start({size: {rows: 7, columns: 12}});
     game.update(300);
     game.render(renderer);
 
@@ -67,12 +67,12 @@ describe('createBreakoutGame', () => {
   it('ends when the ball passes below the paddle', () => {
     let gameOver = false;
     const game = createBreakoutGame({
-      initialBall: { row: 5, column: 0 },
-      initialBallVelocity: { row: 6, column: 0 },
+      initialBall: {row: 5, column: 0},
+      initialBallVelocity: {row: 6, column: 0},
       initialPaddleColumn: 5,
     });
 
-    game.start({ size: { rows: 7, columns: 12 }, onGameOver: () => (gameOver = true) });
+    game.start({size: {rows: 7, columns: 12}, onGameOver: () => (gameOver = true)});
     game.update(400);
 
     expect(gameOver).toBe(true);

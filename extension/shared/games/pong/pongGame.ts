@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardCoordinate, type BoardSize } from '../../core/board';
-import type { BoardRenderer, CommitArcadeGame, GameContext, GameInput } from '../../core/gameTypes';
+import {type BoardCoordinate, type BoardSize, createEmptyFrame} from '../../core/board';
+import type {BoardRenderer, CommitArcadeGame, GameContext, GameInput} from '../../core/gameTypes';
 
 interface PongOptions {
   initialAiRow?: number;
@@ -16,11 +16,11 @@ const PLAYER_SPEED_ROWS_PER_SECOND = 10;
 
 export function createPongGame(options: PongOptions = {}): CommitArcadeGame {
   let context: GameContext | null = null;
-  let size: BoardSize = { rows: 1, columns: 1 };
+  let size: BoardSize = {rows: 1, columns: 1};
   let playerRow = 0;
   let aiRow = 0;
-  let ball: BoardCoordinate = { row: 0, column: 0 };
-  let velocity: BoardCoordinate = { row: 0, column: 0 };
+  let ball: BoardCoordinate = {row: 0, column: 0};
+  let velocity: BoardCoordinate = {row: 0, column: 0};
   let playerDirection = 0;
   let score = 0;
   let stopped = false;
@@ -35,8 +35,14 @@ export function createPongGame(options: PongOptions = {}): CommitArcadeGame {
       size = nextContext.size;
       playerRow = clamp(options.initialPlayerRow ?? centeredPaddleTop(), 0, maxPaddleTop());
       aiRow = clamp(options.initialAiRow ?? centeredPaddleTop(), 0, maxPaddleTop());
-      ball = options.initialBall !== undefined ? { ...options.initialBall } : { row: Math.floor(size.rows / 2), column: Math.floor(size.columns / 2) };
-      velocity = options.initialBallVelocity !== undefined ? { ...options.initialBallVelocity } : { row: 2, column: BALL_SPEED_COLUMNS_PER_SECOND };
+      ball = options.initialBall !== undefined ? {...options.initialBall} : {
+        row: Math.floor(size.rows / 2),
+        column: Math.floor(size.columns / 2),
+      };
+      velocity = options.initialBallVelocity !== undefined ? {...options.initialBallVelocity} : {
+        row: 2,
+        column: BALL_SPEED_COLUMNS_PER_SECOND,
+      };
       playerDirection = 0;
       score = 0;
       stopped = false;
@@ -75,7 +81,7 @@ export function createPongGame(options: PongOptions = {}): CommitArcadeGame {
   };
 
   function moveBall(seconds: number): void {
-    ball = { row: ball.row + velocity.row * seconds, column: ball.column + velocity.column * seconds };
+    ball = {row: ball.row + velocity.row * seconds, column: ball.column + velocity.column * seconds};
     if (ball.row < 0) {
       ball.row = 0;
       velocity.row = Math.abs(velocity.row);
@@ -114,8 +120,8 @@ export function createPongGame(options: PongOptions = {}): CommitArcadeGame {
   }
 
   function resetBallTowardPlayer(): void {
-    ball = { row: Math.floor(size.rows / 2), column: aiColumn() - 1 };
-    velocity = { row: 1, column: -BALL_SPEED_COLUMNS_PER_SECOND };
+    ball = {row: Math.floor(size.rows / 2), column: aiColumn() - 1};
+    velocity = {row: 1, column: -BALL_SPEED_COLUMNS_PER_SECOND};
   }
 
   function drawPaddle(frame: ReturnType<typeof createEmptyFrame>, column: number, top: number, state: 'enemy' | 'player'): void {

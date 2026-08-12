@@ -1,5 +1,5 @@
-import { createEmptyFrame, type BoardFrame, type PixelState } from './board';
-import type { ContributionGraph } from './githubContributionGraph';
+import {type BoardFrame, createEmptyFrame, type PixelState} from './board';
+import type {ContributionGraph} from './githubContributionGraph';
 
 export type CommitArcadeMode = 'arcade' | 'contribution';
 

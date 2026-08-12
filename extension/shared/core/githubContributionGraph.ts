@@ -1,4 +1,4 @@
-import type { BoardCoordinate, BoardSize } from './board';
+import type {BoardCoordinate, BoardSize} from './board';
 
 export interface ContributionCell {
   coordinate: BoardCoordinate;
@@ -66,7 +66,7 @@ function graphFromPositionedElements(elements: Element[], container: Element): C
   return {
     cells,
     container,
-    size: { rows: rows.length, columns: columns.length },
+    size: {rows: rows.length, columns: columns.length},
   };
 }
 

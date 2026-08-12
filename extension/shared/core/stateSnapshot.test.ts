@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { restoreSnapshot, snapshotCells } from './stateSnapshot';
+import {restoreSnapshot, snapshotCells} from './stateSnapshot';
 
 describe('stateSnapshot', () => {
   it('restores classes, inline styles, attributes, text, and removes extension-owned attributes', () => {

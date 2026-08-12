@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { gameRegistry } from './gameRegistry';
+import {gameRegistry} from './gameRegistry';
 
 describe('gameRegistry', () => {
   it('marks the shipped games as playable and the remaining games as planned', () => {

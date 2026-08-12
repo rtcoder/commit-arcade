@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const ROOT = process.cwd();
 
@@ -11,7 +11,7 @@ describe('release workflow', () => {
 
     expect(workflow).toContain('push:');
     expect(workflow).toContain('tags:');
-    expect(workflow).toContain("'v*'");
+    expect(workflow).toContain('\'v*\'');
     expect(workflow).toContain('contents: write');
     expect(workflow).toContain('actions/checkout@v7');
     expect(workflow).toContain('actions/setup-node@v7');
