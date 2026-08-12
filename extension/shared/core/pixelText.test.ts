@@ -36,6 +36,20 @@ describe('createPixelMenuFrame', () => {
     expect(accentRows.some((row) => row < 6)).toBe(true);
     expect(accentRows.some((row) => row > 15)).toBe(true);
     expect(accentRows.every((row) => row < 6 || row > 15)).toBe(true);
+    expect(frame[0]?.every((state) => state === 'empty')).toBe(true);
+    expect(frame[20]?.every((state) => state === 'empty')).toBe(true);
+  });
+
+  it('supports intermediate scroll offsets for smooth wheel transitions', () => {
+    const frame = createPixelMenuFrame({
+      labels: ['PREV', 'SEL', 'NEXT'],
+      scrollOffsetRows: 5,
+      selectedIndex: 1,
+      size: {columns: 53, rows: 21},
+    });
+    const playerRows = rowsContaining(frame, 'player');
+
+    expect(playerRows).toEqual([11, 12, 13, 14, 15, 16, 17, 18, 19]);
   });
 
   it('draws each glyph in a five by ten pixel box', () => {

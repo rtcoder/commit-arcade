@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import type {CommitArcadeSettingsStorage} from '../core/settings';
 
 import {initializeCommitArcade} from './contentScript';
@@ -138,6 +138,39 @@ describe('initializeCommitArcade', () => {
     expect(playButton?.textContent).toContain('Play');
 
     controller.destroy();
+  });
+
+  it('renders an intermediate scroll frame when changing the board menu selection', () => {
+    document.body.innerHTML = contributionGraphFixture();
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    const originalCancelAnimationFrame = window.cancelAnimationFrame;
+    const frameCallbacks: FrameRequestCallback[] = [];
+    window.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    });
+    window.cancelAnimationFrame = vi.fn();
+
+    const controller = initializeCommitArcade(document);
+
+    try {
+      document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+      window.dispatchEvent(new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'ArrowDown'}));
+
+      expect(menuRowsContaining('player').every((row) => row >= 11)).toBe(true);
+
+      frameCallbacks.at(-1)?.(window.performance.now() + 200);
+
+      const settledRows = menuRowsContaining('player');
+
+      expect(Math.min(...settledRows)).toBe(6);
+      expect(Math.max(...settledRows)).toBe(15);
+
+    } finally {
+      controller.destroy();
+      window.requestAnimationFrame = originalRequestAnimationFrame;
+      window.cancelAnimationFrame = originalCancelAnimationFrame;
+    }
   });
 
   it('starts a playable game in the contribution cells and restores the graph on Stop', () => {
@@ -648,6 +681,15 @@ function createMemoryStorage(values: Record<string, unknown>): CommitArcadeSetti
       Object.assign(values, patch);
     },
   };
+}
+
+function menuRowsContaining(state: string): number[] {
+  const board = document.querySelector<HTMLElement>('.commit-arcade-board');
+  const columns = Number(board?.style.getPropertyValue('--commit-arcade-board-columns') ?? 1);
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('.commit-arcade-board-cell')).flatMap((cell, index) =>
+    cell.dataset.commitArcadeState === state ? [Math.floor(index / columns)] : [],
+  );
+  return [...new Set(rows)];
 }
 
 async function flushPromises(): Promise<void> {

@@ -29,6 +29,8 @@ import {createTetrisGame} from '../games/tetris/tetrisGame';
 import {createTronGame} from '../games/tron/tronGame';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
+const MENU_SCROLL_DURATION_MS = 160;
+const MENU_SCROLL_ROWS = 10;
 
 export interface CommitArcadeController {
   destroy(): void;
@@ -67,6 +69,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
   let activeMenuRenderer: BoardRenderer | null = null;
   let activeMenuSelection = 0;
   let activeMenuDetail: HTMLElement | null = null;
+  let activeMenuAnimationFrame = 0;
   const highScores: Record<string, number> = {};
   let selectedGame = 'runner';
   let settingsLoaded = options.storage === undefined;
@@ -163,6 +166,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeMenuRenderer = null;
     activeMenuDetail?.remove();
     activeMenuDetail = null;
+    cancelMenuAnimation();
     inputManager.deactivate();
     activeGame = playableGame;
     activeScore = 0;
@@ -234,6 +238,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeMenuRenderer = null;
     activeMenuDetail?.remove();
     activeMenuDetail = null;
+    cancelMenuAnimation();
     if (activeSnapshot !== null) {
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
@@ -289,8 +294,9 @@ export function initializeCommitArcade(root: Document = document, options: Commi
         }
         return;
       }
-      activeMenuSelection = wrapMenuSelection(input.key === 'ArrowUp' ? activeMenuSelection - 1 : activeMenuSelection + 1, activeMenuGames.length);
-      renderMenuSelection();
+      const direction = input.key === 'ArrowUp' ? -1 : 1;
+      activeMenuSelection = wrapMenuSelection(activeMenuSelection + direction, activeMenuGames.length);
+      animateMenuSelection(direction);
     });
     button.textContent = '× Close';
     button.setAttribute('aria-label', 'Close Commit Arcade menu');
@@ -305,6 +311,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     activeMenuRenderer = null;
     activeMenuDetail?.remove();
     activeMenuDetail = null;
+    cancelMenuAnimation();
     if (activeSnapshot !== null) {
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
@@ -327,17 +334,47 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     return activeArcadeBoard;
   }
 
-  function renderMenuSelection(): void {
+  function renderMenuSelection(scrollOffsetRows = 0): void {
     if (activeMenu === null) {
       return;
     }
     updateBoardGameMenuSelection(activeMenu, activeMenuSelection);
     activeMenuRenderer?.render(createPixelMenuFrame({
       labels: activeMenuGames.map((game) => menuLabelForGame(game.id)),
+      scrollOffsetRows,
       selectedIndex: activeMenuSelection,
       size: activeArcadeBoard?.graph.size ?? {columns: 1, rows: 1},
     }));
     renderMenuDetail(activeMenuDetail, activeMenuGames[activeMenuSelection]);
+  }
+
+  function animateMenuSelection(direction: number): void {
+    cancelMenuAnimation();
+    const initialOffset = direction * MENU_SCROLL_ROWS;
+    const startedAt = view.performance.now();
+    renderMenuSelection(initialOffset);
+
+    const step = (now: number): void => {
+      const progress = Math.min(1, Math.max(0, (now - startedAt) / MENU_SCROLL_DURATION_MS));
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const offset = Math.round(initialOffset * (1 - eased));
+      renderMenuSelection(offset);
+      if (progress < 1) {
+        activeMenuAnimationFrame = view.requestAnimationFrame(step);
+        return;
+      }
+      activeMenuAnimationFrame = 0;
+    };
+
+    activeMenuAnimationFrame = view.requestAnimationFrame(step);
+  }
+
+  function cancelMenuAnimation(): void {
+    if (activeMenuAnimationFrame === 0) {
+      return;
+    }
+    view.cancelAnimationFrame(activeMenuAnimationFrame);
+    activeMenuAnimationFrame = 0;
   }
 
   function restartGame(button: HTMLButtonElement): void {
