@@ -10,6 +10,8 @@ import { createRunnerGame } from '../games/runner/runnerGame';
 import { createSnakeGame } from '../games/snake/snakeGame';
 import type { CommitArcadeGame, GameMetadata } from '../core/gameTypes';
 
+const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
+
 export interface CommitArcadeController {
   destroy(): void;
 }
@@ -134,6 +136,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
     selectedGame = game.id;
     persistSettings({ selectedGame });
     activeSnapshot = snapshotCells(graph.cells.map((cell) => cell.element));
+    graph.container.classList.add(ACTIVE_GRAPH_CLASS);
     activeSession = showSession(root, graph.container, ownedElements, {
       game: playableGame,
       highScore: highScores[game.id] ?? 0,
@@ -193,6 +196,7 @@ export function initializeCommitArcade(root: Document = document, options: Commi
       restoreSnapshot(activeSnapshot);
       activeSnapshot = null;
     }
+    activeGraph?.container.classList.remove(ACTIVE_GRAPH_CLASS);
     root.querySelector('.commit-arcade-picker')?.remove();
     activeSession?.remove();
     activeSession = null;

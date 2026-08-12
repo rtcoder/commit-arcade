@@ -138,23 +138,38 @@
   }
 }
 
+.commit-arcade-game-active .ContributionCalendar-day,
+.commit-arcade-game-active rect[data-date],
+.commit-arcade-game-active [data-date][data-level],
+.commit-arcade-game-active [data-date][data-count] {
+  fill: var(--commit-arcade-empty) !important;
+  background-color: var(--commit-arcade-empty) !important;
+}
+
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='player'],
 .commit-arcade-cell[data-commit-arcade-state='player'] {
   fill: var(--commit-arcade-player) !important;
   background-color: var(--commit-arcade-player) !important;
 }
 
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='enemy'],
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='obstacle'],
 .commit-arcade-cell[data-commit-arcade-state='enemy'],
 .commit-arcade-cell[data-commit-arcade-state='obstacle'] {
   fill: var(--commit-arcade-enemy) !important;
   background-color: var(--commit-arcade-enemy) !important;
 }
 
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='bonus'],
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='accent'],
 .commit-arcade-cell[data-commit-arcade-state='bonus'],
 .commit-arcade-cell[data-commit-arcade-state='accent'] {
   fill: var(--commit-arcade-accent) !important;
   background-color: var(--commit-arcade-accent) !important;
 }
 
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='projectile'],
+.commit-arcade-game-active .commit-arcade-cell[data-commit-arcade-state='trail'],
 .commit-arcade-cell[data-commit-arcade-state='projectile'],
 .commit-arcade-cell[data-commit-arcade-state='trail'] {
   fill: var(--commit-arcade-danger) !important;

@@ -98,6 +98,34 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 
+  it('neutralizes contribution cell colors during gameplay and restores the graph mode on Stop', () => {
+    document.body.innerHTML = `
+      <section aria-label="Contribution Graph">
+        <svg>
+          <rect class="ContributionCalendar-day" data-date="2026-01-01" data-level="4" x="0" y="0" fill="#216e39"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-02" data-level="3" x="12" y="0" fill="#30a14e"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-03" data-level="2" x="0" y="12" fill="#40c463"></rect>
+          <rect class="ContributionCalendar-day" data-date="2026-01-04" data-level="1" x="12" y="12" fill="#9be9a8"></rect>
+        </svg>
+      </section>
+    `;
+
+    const controller = initializeCommitArcade(document);
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+    document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')[0]?.click();
+
+    const graph = document.querySelector('section[aria-label="Contribution Graph"]');
+
+    expect(graph?.classList.contains('commit-arcade-game-active')).toBe(true);
+
+    document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
+
+    expect(graph?.classList.contains('commit-arcade-game-active')).toBe(false);
+    expect(document.querySelector('rect')?.getAttribute('fill')).toBe('#216e39');
+
+    controller.destroy();
+  });
+
   it('stops an active game with Escape and restores the graph', () => {
     document.body.innerHTML = `
       <section aria-label="Contribution Graph">
