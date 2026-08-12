@@ -6,8 +6,10 @@ interface PixelMenuOptions {
   size: BoardSize;
 }
 
-const GLYPH_HEIGHT = 5;
-const GLYPH_WIDTH = 3;
+const GLYPH_HEIGHT = 10;
+const GLYPH_WIDTH = 5;
+const SOURCE_GLYPH_HEIGHT = 5;
+const SOURCE_GLYPH_WIDTH = 3;
 const GLYPH_GAP = 1;
 const ROW_GAP = 1;
 
@@ -83,7 +85,9 @@ function drawGlyph(frame: BoardFrame, glyph: readonly string[] | undefined, row:
   for (let y = 0; y < GLYPH_HEIGHT; y += 1) {
     const frameRow = frame[row + y];
     for (let x = 0; x < GLYPH_WIDTH; x += 1) {
-      if (glyph[y]?.[x] === '1' && frameRow?.[column + x] !== undefined) {
+      const sourceY = Math.floor((y * SOURCE_GLYPH_HEIGHT) / GLYPH_HEIGHT);
+      const sourceX = Math.floor((x * SOURCE_GLYPH_WIDTH) / GLYPH_WIDTH);
+      if (glyph[sourceY]?.[sourceX] === '1' && frameRow?.[column + x] !== undefined) {
         frameRow[column + x] = state;
       }
     }
