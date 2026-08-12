@@ -64,7 +64,7 @@ describe('initializeCommitArcade', () => {
     playButtons[0]?.click();
 
     expect(document.querySelector('[role="menu"]')?.textContent).toContain('Commit Runner');
-    expect(document.querySelector('[aria-disabled="true"]')?.textContent).toContain('Space Invaders');
+    expect(document.querySelector('[aria-disabled="true"]')?.textContent).toContain('Tron');
 
     second.destroy();
     first.destroy();
@@ -249,11 +249,11 @@ describe('initializeCommitArcade', () => {
     controller.destroy();
   });
 
-  it('starts Pong and Breakout from playable picker entries', () => {
+  it('starts newly shipped games from playable picker entries', () => {
     document.body.innerHTML = contributionGraphFixture();
 
     const controller = initializeCommitArcade(document);
-    for (const gameName of ['Pong', 'Breakout']) {
+    for (const gameName of ['Pong', 'Breakout', 'Space Invaders', 'Frogger']) {
       document.querySelector<HTMLButtonElement>('.commit-arcade-button')?.click();
       const item = Array.from(document.querySelectorAll<HTMLButtonElement>('.commit-arcade-picker-item')).find((button) =>
         button.textContent?.includes(gameName),

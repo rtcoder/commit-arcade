@@ -35,7 +35,7 @@ export const gameRegistry: readonly GameMetadata[] = [
     id: 'space-invaders',
     name: 'Space Invaders',
     description: 'A compressed seven-row invader wave.',
-    status: 'planned',
+    status: 'playable',
   },
   {
     id: 'tron',
@@ -47,7 +47,7 @@ export const gameRegistry: readonly GameMetadata[] = [
     id: 'frogger',
     name: 'Frogger',
     description: 'Seven contribution rows as traffic and safe lanes.',
-    status: 'planned',
+    status: 'playable',
   },
   {
     id: 'helicopter',

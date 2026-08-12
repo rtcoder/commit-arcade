@@ -61,6 +61,8 @@ describe('v1 public website content', () => {
     expect(games).toContain('Flappy Commit');
     expect(games).toContain('Pong');
     expect(games).toContain('Breakout');
+    expect(games).toContain('Space Invaders');
+    expect(games).toContain('Frogger');
     expect(games).toContain('Arrow keys');
     expect(games).toContain('Space');
     expect(games).toContain('Escape');

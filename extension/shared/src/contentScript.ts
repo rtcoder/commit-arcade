@@ -7,9 +7,11 @@ import { loadSettings, saveSettings, type CommitArcadeSettings, type CommitArcad
 import { restoreSnapshot, snapshotCells, type GraphSnapshot } from '../core/stateSnapshot';
 import { createBreakoutGame } from '../games/breakout/breakoutGame';
 import { createFlappyGame } from '../games/flappy/flappyGame';
+import { createFroggerGame } from '../games/frogger/froggerGame';
 import { createPongGame } from '../games/pong/pongGame';
 import { createRunnerGame } from '../games/runner/runnerGame';
 import { createSnakeGame } from '../games/snake/snakeGame';
+import { createSpaceInvadersGame } from '../games/spaceInvaders/spaceInvadersGame';
 import type { CommitArcadeGame, GameMetadata } from '../core/gameTypes';
 
 const ACTIVE_GRAPH_CLASS = 'commit-arcade-game-active';
@@ -332,6 +334,10 @@ function createPlayableGame(gameId: string, overrides: CommitArcadeOptions['game
       return createPongGame();
     case 'breakout':
       return createBreakoutGame();
+    case 'space-invaders':
+      return createSpaceInvadersGame();
+    case 'frogger':
+      return createFroggerGame();
     default:
       return null;
   }
@@ -416,6 +422,10 @@ function usedKeysForGame(gameId: string): ReadonlySet<string> {
       return new Set(['ArrowUp', 'ArrowDown', 'w', 's', 'W', 'S', 'Escape']);
     case 'breakout':
       return new Set(['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D', 'Escape']);
+    case 'space-invaders':
+      return new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', ' ', 'Space', 'a', 'd', 'A', 'D', 'Escape']);
+    case 'frogger':
+      return new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D', 'Escape']);
     default:
       return new Set(['Escape']);
   }
@@ -433,6 +443,10 @@ function controlsHelpForGame(gameId: string): string {
       return 'Move paddle with Up/Down or W/S. Esc stops.';
     case 'breakout':
       return 'Move paddle with Left/Right or A/D. Esc stops.';
+    case 'space-invaders':
+      return 'Move with Left/Right, fire with Up or Space. Esc stops.';
+    case 'frogger':
+      return 'Hop with arrows or WASD. Esc stops.';
     default:
       return 'Esc stops.';
   }
