@@ -7,16 +7,20 @@
   "scripts": {
     "build:chrome": "node scripts/build-extension.mjs chrome",
     "build:firefox": "node scripts/build-extension.mjs firefox",
+    "build:all": "npm run build:chrome && npm run build:firefox",
     "lint": "tsc --noEmit",
     "package:archives": "node scripts/package-extension.mjs all",
     "package:amo-source": "node scripts/package-amo-source.mjs",
     "package:chrome": "node scripts/package-extension.mjs chrome",
     "package:firefox": "node scripts/package-extension.mjs firefox",
+    "package:all": "npm run package:archives && npm run package:amo-source && npm run package:chrome && npm run package:firefox",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "validate:chrome": "node scripts/validate-extension-package.mjs chrome",
     "validate:firefox": "node scripts/validate-extension-package.mjs firefox",
-    "validate:packages": "npm run validate:chrome && npm run validate:firefox"
+    "validate:packages": "npm run validate:chrome && npm run validate:firefox",
+    "validate:all": "npm run validate:chrome && npm run validate:firefox",
+    "all": "npm run lint && npm run typecheck && npm run build:all && npm run package:all && npm run validate:all"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
