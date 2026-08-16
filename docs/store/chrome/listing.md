@@ -26,10 +26,14 @@ Play tiny arcade games on your GitHub contribution graph.
 ```text
 Commit Arcade turns the visible GitHub contribution graph on a profile page into a tiny local arcade screen.
 
-Open a GitHub profile with a contribution graph, press Play, and choose Commit Runner, Snake, or Flappy Commit. Games render directly on the existing graph cells and restore the original graph state when you stop, press Escape, hide the tab, or navigate away.
+Open a GitHub profile with a contribution graph, press Play, and choose a game from the pixel arcade menu. The extension includes multiple classic-inspired mini games designed for the shape of the contribution grid.
+
+Games render locally on graph-style cells and restore the original graph state when you stop, press Escape, hide the tab, or navigate away. The menu supports keyboard navigation, with Arrow keys to change the selected game and Enter to start.
 
 Commit Arcade is intentionally local and lightweight. It runs only on github.com, does not request broad extension permissions, does not collect credentials or contribution data, and does not send telemetry or analytics. Gameplay preferences and high scores remain local in browser storage.
 ```
+
+Avoid listing individual game names in the Chrome Web Store description. Chrome Web Store review may treat long game-name lists as keyword stuffing.
 
 ## Category And Support
 
